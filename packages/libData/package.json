@@ -1,0 +1,15 @@
+{
+	"name": "@pkg/lib-data",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"author": "Asaf Semo",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "yarn g:tsc -b",
+		"lint": "eslint ."
+	},
+	"devDependencies": {
+		"@pkg/dev-config": "*"
+	}
+}

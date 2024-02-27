@@ -1,0 +1,17 @@
+### domain localhost
+@domain=http://127.0.0.1:8080
+# @domain=http://127.0.0.1:3001
+# @domain = http://dev.serverurl.com:19001
+
+
+### - GET Request
+POST {{domain}}/auth/login HTTP/1.1
+
+### - POST request
+GET {{domain}}/auth/logout HTTP/1.1
+
+### - PUT request
+GET {{domain}}/auth/islogin HTTP/1.1
+
+### - DELETE request
+POST {{domain}}/auth/forgotmypassword HTTP/1.1

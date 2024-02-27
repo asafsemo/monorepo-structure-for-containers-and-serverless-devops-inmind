@@ -1,0 +1,36 @@
+{
+	"name": "@template/cronjobs",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"author": "Asaf Semo",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "yarn g:tsc -b",
+		"build-dev": "yarn build",
+		"unit_tests": "echo --config=./test/config/jasmine.json",
+		"exec-docker": "rundev",
+		"exec-dev": "CRON_JOB_NAME=testrunner rundev"
+	},
+	"engines": {
+		"node": ">=18.x"
+	},
+	"devDependencies": {
+		"@pkg-tests/lib-core": "*",
+		"@pkg/dev-config": "*",
+		"@types/aws-lambda": "^8.10.134",
+		"@types/node": "^20.11.20",
+		"@types/source-map-support": "^0.5.10"
+	},
+	"dependencies": {
+		"@aws-lambda-powertools/logger": "^1.18.1",
+		"@aws-lambda-powertools/tracer": "^1.18.1",
+		"@pkg/lib-containers": "*",
+		"@pkg/lib-core": "*",
+		"@pkg/lib-data": "*",
+		"aws-lambda": "^1.0.7",
+		"aws-lambda-response-builder": "^1.0.15",
+		"source-map-support": "^0.5.21"
+	}
+}

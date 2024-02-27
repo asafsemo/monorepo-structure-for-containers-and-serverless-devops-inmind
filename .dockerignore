@@ -1,0 +1,11 @@
+**/.DS_Store
+**/.Dockerfile
+**/.env
+**/.eslintrc.cjs
+**/.turbo
+**/tsconfig.json
+**/src
+**/devConfig
+
+**/.circleci
+**/.github

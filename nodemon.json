@@ -1,0 +1,7 @@
+{
+    "watch": ["./packages", "./packages-tests", "./apps"],
+    "ext": "json, ts, proto",
+    "ignore": ["node_modules", "coverage", "**/dist/*"],
+    "restartable": "rs",
+    "exec": "yarn install && yarn build && node run-dev.js"
+}

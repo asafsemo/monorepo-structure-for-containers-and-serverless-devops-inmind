@@ -1,0 +1,73 @@
+### domain localhost
+@domain=http://127.0.0.1:8080
+# @domain=http://127.0.0.1:3011/api/v1
+# @domain = http://dev.serverurl.com:19001
+
+
+### Items
+
+### - list items
+GET {{domain}}/items  HTTP/1.1
+
+### - update/upsert item
+PUT {{domain}}/items/save  HTTP/1.1
+Content-Type: application/json
+
+{
+  "_id": "65ddcb1e6576d1ad20d93334",
+  "name": "Asaf23"
+}
+
+### - setstatus
+PUT {{domain}}/items/setstatus HTTP/1.1
+Content-Type: application/json
+
+{
+  "id":"65ddcb1e6576d1ad20d93334",
+  "status":true
+}
+
+### - availability
+GET {{domain}}/items/65ddcb1e6576d1ad20d93334/availability HTTP/1.1
+
+### - item copy
+POST {{domain}}/items/65ddcb1e6576d1ad20d93334/copy HTTP/1.1
+
+### - get by id
+GET {{domain}}/items/65ddcb1e6576d1ad20d93334  HTTP/1.1
+
+
+### Overdue items
+
+### - list overdue items
+GET {{domain}}/items/overdue  HTTP/1.1
+
+### - overdue item copy
+POST {{domain}}/items/overdue/:id/copy  HTTP/1.1
+
+
+
+### Orders
+
+
+### - list order
+GET {{domain}}/orders  HTTP/1.1
+
+### - insert new order
+POST {{domain}}/orders/new  HTTP/1.1
+Content-Type: application/json
+
+{
+  "itemId":"111",
+  "quantity":"1"
+}
+
+
+### Tickets
+
+
+### - list tickets
+GET {{domain}}/items/tickets  HTTP/1.1
+
+
+

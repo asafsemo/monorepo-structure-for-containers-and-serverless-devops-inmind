@@ -1,0 +1,131 @@
+org: presentation
+app: store-auth-api
+
+service: backend-api-${self:custom.version}
+custom: ${file(../../../packages/dev-config/serverless.common.yml):custom}
+
+package:
+    individually: false
+    patterns: ${self:custom.patterns}
+
+provider:
+    iam:
+        role: ${ssm:/store/iam/lambda_role_arn}
+    name: aws
+    deploymentMethod: direct
+    runtime: nodejs18.x
+    stage: ${opt:stage, 'dev'}
+    versionFunctions: false
+    logRetentionInDays: ${ssm:/store/logs/retention}
+    region: eu-west-1
+    timeout: 30 # optional, in seconds, default is 6
+    # vpc:
+    #     securityGroupIds:
+    #         - ${ssm:/store/vpc/lambda_security_group_id}
+    #     subnetIds:
+    #         - ${ssm:/store/vpc/subnet_id_0}
+    #         - ${ssm:/store/vpc/subnet_id_1}
+    tracing:
+        # apiGateway: true
+        lambda: true
+    apiGateway:
+        restApiId: ${ssm:/store/api_gateway/website/restId}
+        restApiRootResourceId: ${ssm:/store/api_gateway/website/root_resourceId/v1}
+    environment:
+        SERVICE_VERSION: ${self:custom.version}
+        S3_DYAMICBUCKET_REGION: ${ssm:/store/s3/region}
+        ENV: ${ssm:/store/environment}
+        SITE_OPERATION_EMAIL: 'store@store.co.il'
+    deploymentBucket:
+        name: ${self:custom.deploymentBucket.name}
+
+functions:
+    setItemStatus:
+        handler: dist/lambda_controllers/setItemStatus.awsLambdaHandler
+        memorySize: 350
+        events:
+            - http:
+                path: items/setstatus
+                method: put
+
+    checkItemAvailability:
+        handler: dist/lambda_controllers/checkItemAvailability.awsLambdaHandler
+        memorySize: 350
+        events:
+            - http:
+                path: items/{id}/availability
+                method: get
+
+    copyItem:
+        handler: dist/lambda_controllers/copyItem.awsLambdaHandler
+        memorySize: 350
+        events:
+            - http:
+                path: items/{id}/copy
+                method: post
+
+    copyOverdueItem:
+        handler: dist/lambda_controllers/copyOverdueItem.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: items/overdue/{id}/copy 
+                method: post
+
+    itemById:
+        handler: dist/lambda_controllers/itemById.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: items/{id}
+                method: get
+
+    listItems:
+        handler: dist/lambda_controllers/listItems.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: items
+                method: get
+            # run at 12 am
+            - schedule: cron(0 9 * * ? *)
+
+    listOrders:
+        handler: dist/lambda_controllers/listOrders.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: orders
+                method: get
+
+    listOverdueItems:
+        handler: dist/lambda_controllers/listOverdueItems.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: items/overdue
+                method: get
+
+    listTickets:
+        handler: dist/lambda_controllers/listTickets.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: tickets
+                method: get
+
+    newOrder:
+        handler: dist/lambda_controllers/newOrder.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: orders/new
+                method: post
+
+    saveItem:
+        handler: dist/lambda_controllers/saveItem.awsLambdaHandler
+        memorySize: 300
+        events:
+            - http:
+                path: items/save
+                method: put

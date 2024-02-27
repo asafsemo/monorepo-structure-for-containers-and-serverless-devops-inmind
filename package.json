@@ -1,0 +1,37 @@
+{
+    "name": "template-monorepo-project",
+    "version": "1.0.0",
+    "main": "index.js",
+    "author": "Asaf Semo",
+    "private": true,
+    "type": "module",
+    "workspaces": [
+        "apps/**",
+        "packages/**",
+        "packages-tests/**"
+    ],
+    "scripts": {
+        "build": "turbo build --no-daemon",
+        "dev": "nodemon",
+        "serverless": "NODEMON_SCRIPT=exec-serverless nodemon",
+        "clean": "node clean.js",
+        "lint": "turbo lint --no-daemon",
+        "g:tsc": "cd $INIT_CWD && tsc-absolute"
+    },
+    "devDependencies": {
+        "c8": "^9.1.0",
+        "eslint": "^8.57.0",
+        "nodemon": "^3.1.0",
+        "prettier": "^3.2.5",
+        "rimraf": "^5.0.5",
+        "tsc-absolute": "^1.0.1",
+        "turbo": "^1.12.4",
+        "typescript": "^5.3.3"
+    },
+    "dependenciesMeta": {
+        "nodemon": {
+            "unplugged": false
+        }
+    },
+    "packageManager": "yarn@4.1.0"
+}

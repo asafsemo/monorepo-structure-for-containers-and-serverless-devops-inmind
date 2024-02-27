@@ -1,0 +1,17 @@
+// once
+
+# npm install --global yarn
+# npm install --global corepack
+
+//////////////////////////
+
+yarn set version stable
+yarn dlx @yarnpkg/sdks vscode
+yarn workspaces focus --all --production
+
+yarn install
+
+docker rmi $(docker images -a -q)
+docker rm -f $(docker ps -a -q)
+
+// add ZipFS - a zip file system Extension 

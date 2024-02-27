@@ -1,0 +1,20 @@
+{
+	"name": "@pkg/lib-core",
+	"version": "1.0.0",
+	"main": "dist/index.js",
+	"author": "Asaf Semo",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "yarn g:tsc -b",
+		"lint": "eslint ."
+	},
+	"devDependencies": {
+		"@pkg/dev-config": "*",
+		"@types/node": "^20.11.20"
+	},
+	"dependencies": {
+		"@pkg/lib-containers": "*",
+		"@pkg/lib-data": "*"
+	}
+}

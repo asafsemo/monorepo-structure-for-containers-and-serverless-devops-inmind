@@ -1,0 +1,30 @@
+version: '3'
+services:
+    store-auth-api:
+        build:
+            context: ../
+            dockerfile: ./apps/auth/api/.Dockerfile
+            args:
+                SERVICE_PATH: ./apps/auth/api
+        ports:
+            - 9001:9001
+        environment:
+            - APP_NAME=storeApi
+            - HTTP_SERVER_ADDRESS=0.0.0.0
+            - HTTP_SERVER_PORT=9001
+            - DYNAMIC_RUNTIME_PATH=./dist/runtime_load/**/*.js
+            - DYNAMIC_CONTROLLERS_PATH=./dist/fastify_controllers/*.js
+            - LOGGER_LEVEL=debug
+            - LOGGER_JSON=false
+            - OPENAPI_ENABLE=true
+    #     depends_on:
+    #         mongodb-migrations:
+    #             condition: service_completed_successfully
+    #         rabbitmq-queue:
+    #             condition: service_healthy
+    #     healthcheck:
+    #         test: rabbitmq-diagnostics -q ping
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 3
+    #         start_period: 0s
