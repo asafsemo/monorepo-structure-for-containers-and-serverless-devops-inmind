@@ -1,0 +1,1 @@
+# monorepo-structure-for-containers-and-serverless-devops-inmind
