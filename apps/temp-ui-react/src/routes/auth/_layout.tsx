@@ -1,17 +1,12 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
+import { MainMenuLayout } from '@/layouts/main-menu.tsx'
+import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/auth/_layout')({
-  component: AppLayoutComponent,
+  component: AuthLayout,
 })
 
-function AppLayoutComponent() {
-  const { t } = useTranslation()
-  
+function AuthLayout() {
   return (
-    <div>
-      <h1>{t('pages.auth.layout.title')}</h1>
-      <Outlet />
-    </div>
+    <MainMenuLayout></MainMenuLayout>
   )
 }

@@ -13,8 +13,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthLayoutRouteImport } from './routes/auth/_layout'
+import { Route as AuthLayoutLoginRouteImport } from './routes/auth/_layout/login'
 
 const AuthRouteImport = createFileRoute('/auth')()
 
@@ -33,48 +33,48 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthLayoutLoginRoute = AuthLayoutLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthLayoutRoute
-  '/auth/login': typeof AuthLoginRoute
+  '/auth': typeof AuthLayoutRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/auth/login': typeof AuthLayoutLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthLayoutRoute
-  '/auth/login': typeof AuthLoginRoute
+  '/auth': typeof AuthLayoutRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/auth/login': typeof AuthLayoutLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
-  '/auth/_layout': typeof AuthLayoutRoute
-  '/auth/login': typeof AuthLoginRoute
+  '/auth/_layout': typeof AuthLayoutRouteWithChildren
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/auth/_layout/login': typeof AuthLayoutLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/auth/login' | '/demo/tanstack-query'
+  fullPaths: '/' | '/auth' | '/demo/tanstack-query' | '/auth/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/auth/login' | '/demo/tanstack-query'
+  to: '/' | '/auth' | '/demo/tanstack-query' | '/auth/login'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/auth/_layout'
-    | '/auth/login'
     | '/demo/tanstack-query'
+    | '/auth/_layout/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,13 +106,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/auth/_layout': {
       id: '/auth/_layout'
       path: '/auth'
@@ -120,17 +113,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/auth/_layout/login': {
+      id: '/auth/_layout/login'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLayoutLoginRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
   }
 }
 
+interface AuthLayoutRouteChildren {
+  AuthLayoutLoginRoute: typeof AuthLayoutLoginRoute
+}
+
+const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
+  AuthLayoutLoginRoute: AuthLayoutLoginRoute,
+}
+
+const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
+  AuthLayoutRouteChildren,
+)
+
 interface AuthRouteChildren {
-  AuthLayoutRoute: typeof AuthLayoutRoute
-  AuthLoginRoute: typeof AuthLoginRoute
+  AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthLayoutRoute: AuthLayoutRoute,
-  AuthLoginRoute: AuthLoginRoute,
+  AuthLayoutRoute: AuthLayoutRouteWithChildren,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
