@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import logo from '../logo.svg'
 
 export const Route = createFileRoute('/')({
@@ -6,6 +7,8 @@ export const Route = createFileRoute('/')({
 })
 
 function App() {
+  const { t } = useTranslation()
+  
   return (
     <div className="text-center">
       <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
@@ -15,7 +18,7 @@ function App() {
           alt="logo"
         />
         <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
+          {t('pages.home.editInstructions')}
         </p>
         <a
           className="text-[#61dafb] hover:underline"
@@ -23,7 +26,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          {t('pages.home.learnReact')}
         </a>
         <a
           className="text-[#61dafb] hover:underline"
@@ -31,7 +34,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn TanStack
+          {t('pages.home.learnTanStack')}
         </a>
       </header>
     </div>

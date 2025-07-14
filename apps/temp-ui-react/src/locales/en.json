@@ -1,0 +1,149 @@
+{
+  "translation": {
+  "common": {
+    "messages": {
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "success": "Success",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "close": "Close",
+      "confirm": "Confirm"
+    },
+    "navigation": {
+      "home": "Home",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous"
+    },
+    "forms": {
+      "required": "This field is required",
+      "invalidEmail": "Invalid email address",
+      "passwordTooShort": "Password is too short",
+      "passwordRequired": "Password is required"
+    }
+  },
+  "features": {
+    "authentication": {
+      "loginForm": {
+        "title": "Welcome Back",
+        "subtitle": "Sign in to your account to continue",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "Enter your email address",
+        "passwordLabel": "Password", 
+        "passwordPlaceholder": "Enter your password",
+        "submitButton": "Sign In",
+        "or": "Or continue with",
+        "noAccount": "Don't have an account?",
+        "signupLink": "Sign up",
+        "forgotPassword": "Forgot your password?",
+        "rememberMe": "Remember me"
+      },
+      "signupForm": {
+        "title": "Create Account",
+        "subtitle": "Sign up to get started",
+        "firstNameLabel": "First Name",
+        "firstNamePlaceholder": "Enter your first name",
+        "lastNameLabel": "Last Name", 
+        "lastNamePlaceholder": "Enter your last name",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "Enter your email address",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Create a password",
+        "confirmPasswordLabel": "Confirm Password",
+        "confirmPasswordPlaceholder": "Confirm your password",
+        "submitButton": "Create Account",
+        "hasAccount": "Already have an account?",
+        "loginLink": "Sign in",
+        "termsAgreement": "By creating an account, you agree to our Terms of Service and Privacy Policy"
+      },
+      "messages": {
+        "loginSuccess": "Successfully logged in!",
+        "loginError": "Invalid email or password",
+        "logoutSuccess": "Successfully logged out!",
+        "sessionExpired": "Your session has expired. Please log in again.",
+        "accountCreated": "Account created successfully!",
+        "passwordResetSent": "Password reset email sent!",
+        "passwordChanged": "Password changed successfully!"
+      }
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "Welcome to React",
+      "subtitle": "A modern React application with TanStack Router",
+      "editInstructions": "Edit src/routes/index.tsx and save to reload.",
+      "learnReact": "Learn React",
+      "learnTanStack": "Learn TanStack"
+    },
+    "demo": {
+      "tanstackQuery": {
+        "title": "People List",
+        "subtitle": "TanStack Query Demo",
+        "loading": "Loading people...",
+        "error": "Error loading people",
+        "empty": "No people found"
+      }
+    },
+    "auth": {
+      "layout": {
+        "title": "Authentication",
+        "subtitle": "Secure access to your account"
+      },
+      "login": {
+        "title": "Sign In",
+        "pageTitle": "Sign In - My App"
+      },
+      "signup": {
+        "title": "Sign Up",
+        "pageTitle": "Sign Up - My App"  
+      },
+      "forgotPassword": {
+        "title": "Forgot Password",
+        "pageTitle": "Forgot Password - My App"
+      }
+    }
+  },
+  "components": {
+    "header": {
+      "navigation": {
+        "home": "Home",
+        "tanstackQuery": "TanStack Query",
+        "auth": "Authentication",
+        "profile": "Profile",
+        "settings": "Settings"
+      },
+      "userMenu": {
+        "profile": "Profile",
+        "settings": "Settings",
+        "logout": "Logout"
+      }
+    },
+    "footer": {
+      "copyright": "© 2024 My App. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "contact": "Contact Us"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "message": "The page you're looking for doesn't exist.",
+      "backHome": "Go Back Home"
+    },
+    "server": {
+      "title": "Server Error",
+      "message": "Something went wrong on our end.",
+      "retry": "Try Again"
+    },
+    "network": {
+      "title": "Network Error",
+      "message": "Please check your internet connection.",
+      "retry": "Retry"
+    }
+  }
+}
+}

@@ -14,7 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AuthRouteRouteImport } from './routes/auth/_route'
+import { Route as AuthLayoutRouteImport } from './routes/auth/_layout'
 
 const AuthRouteImport = createFileRoute('/auth')()
 
@@ -38,20 +38,20 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthRouteRoute = AuthRouteRouteImport.update({
-  id: '/_route',
+const AuthLayoutRoute = AuthLayoutRouteImport.update({
+  id: '/_layout',
   getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteRoute
+  '/auth': typeof AuthLayoutRoute
   '/auth/login': typeof AuthLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteRoute
+  '/auth': typeof AuthLayoutRoute
   '/auth/login': typeof AuthLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
@@ -59,7 +59,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
-  '/auth/_route': typeof AuthRouteRoute
+  '/auth/_layout': typeof AuthLayoutRoute
   '/auth/login': typeof AuthLoginRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
@@ -72,7 +72,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
-    | '/auth/_route'
+    | '/auth/_layout'
     | '/auth/login'
     | '/demo/tanstack-query'
   fileRoutesById: FileRoutesById
@@ -113,23 +113,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/auth/_route': {
-      id: '/auth/_route'
+    '/auth/_layout': {
+      id: '/auth/_layout'
       path: '/auth'
       fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteRouteImport
+      preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof AuthRoute
     }
   }
 }
 
 interface AuthRouteChildren {
-  AuthRouteRoute: typeof AuthRouteRoute
+  AuthLayoutRoute: typeof AuthLayoutRoute
   AuthLoginRoute: typeof AuthLoginRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthRouteRoute: AuthRouteRoute,
+  AuthLayoutRoute: AuthLayoutRoute,
   AuthLoginRoute: AuthLoginRoute,
 }
 
