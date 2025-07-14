@@ -1,0 +1,577 @@
+---
+description: Working on a vuejs ui project
+globs: 
+alwaysApply: false
+---
+## AI Response Format Rule
+**IMPORTANT**: When answering any question using these rules, always start your response with:
+**🚀 Vue.js Code Generation** 
+
+This indicates that the response follows the Vue.js senior developer guidelines defined in this rules file.
+
+## Agent Mode Instructions+
+Please avoid writing the code changes in the chat panel when the code was implemented in a file
+CRITICAL FOR AGENT MODE: When operating in agent mode, you MUST:
+
+CREATE FILES - Always create actual files in the project structure, don't just describe what should be created
+UPDATE FILES - Modify existing files directly instead of explaining what changes should be made
+FOLLOW FOLDER STRUCTURE - Create files in the correct directories as specified in these rules
+IMPLEMENT COMPLETE SOLUTIONS - Write full, working code implementations
+CREATE MULTIPLE FILES - When a feature requires multiple files (component, service, types, translations), create ALL of them
+UPDATE EXISTING FILES - If changes are needed to existing files (like adding imports, updating stores), make those changes directly
+
+Example Agent Actions:
+
+CREATE: src/features/authentication/components/LoginForm.vue
+CREATE: src/features/authentication/services.ts
+CREATE: src/features/authentication/types.ts
+UPDATE: src/locales/en.json (add new translations)
+UPDATE: src/stores/useStoreAuth.ts (if it exists)
+CREATE: src/pages/login.vue
+
+DO NOT just tell the user "You should create a file called..." - ACTUALLY CREATE THE FILE.
+
+
+## Technology Stack & Architecture
+
+### Core Technologies
+- **Vue 3** with Composition API and `<script setup>` syntax
+- **TypeScript** for type safety
+- **Vite** for build tooling
+- **Unplugin Auto Router** for automatic route generation
+- **TanStack Query** for server state management
+- **Pinia** for client state management
+- **Tailwind CSS** for styling and animations
+- **Shadcn/ui** for UI components
+- **VueUse** for composables
+- **Playwright** for E2E testing
+
+
+### Folder Structure
+```
+src/
+├── pages/           # Auto-router pages
+├── components/
+│   └── ui/         # Shadcn components
+├── features/       # Feature-based modules
+│   └── [feature-name]/
+│       ├── components/
+│       ├── services.ts    # Business logic and API calls
+│       ├── types.ts       # TypeScript type definitions
+│       └── index.ts
+├── stores/         # Pinia stores
+├── layouts/        # Layout components
+├── locales/        # i18n translations (JSON)
+└── assets/         # Static assets (images, JS)
+```
+
+
+### When generating composables:
+* Start function names with "use"
+* Include proper return types
+* Handle errors gracefully
+* Make them reusable and focused on single responsibility
+* Use VueUse composables when possible
+* Keep business logic in services, use composables for reactive state management
+
+### When generating pages:
+* Use kebab-case file naming
+* Include proper meta tags and SEO considerations  
+* Implement proper loading states
+* Use layouts when appropriate
+* Include error boundaries
+* Import services from feature modules for data operations
+* based a page on a layout, default Blank, add to the bottom of the page
+    ```vue
+    <route lang="yaml">
+    meta:
+      layout: {Name of the layout page}
+    </route>
+    ```
+
+### When generating types:
+* Use single `types.ts` file per feature
+* Export interfaces and types clearly
+* Use proper TypeScript conventions (PascalCase for interfaces, interfaces start with I)
+* Include JSDoc comments for complex types
+* Extend base types when appropriate # Vue.js Senior Developer AI Rules for Cursor
+* in features use the types from types, and dont recreate them
+
+
+## Code Quality & Best Practices
+
+### Vue Component Guidelines
+
+1. **Always use `<script setup>` with TypeScript**
+   ```vue
+   <script setup lang="ts">
+   // Component logic here
+   </script>
+   ```
+
+2. **Define Props and Emits with proper typing**
+   ```vue
+   <script setup lang="ts">
+   interface IProps {
+     title: string
+     isActive?: boolean
+   }
+   
+   interface IEmits {
+     update: [value: string]
+     close: []
+   }
+   
+   const props = withDefaults(defineProps<IProps>(), {
+     isActive: false
+   })
+   
+   const emit = defineEmits<IEmits>()
+   </script>
+   ```
+
+3. **Use computed properties for derived state**
+   ```vue
+   <script setup lang="ts">
+   const isValid = computed(() => {
+     return form.value.email && form.value.password
+   })
+   </script>
+   ```
+
+4. **Prefer composables over mixins**
+   - Extract reusable logic into composables
+   - Use VueUse composables when available
+   - Create business logic and API calls in `features/[feature]/services.ts`
+
+
+Mandate shadcn/ui usage for all UI primitives.
+Always use shadcn/ui components for form elements, buttons, cards, etc., instead of native HTML elements.
+documentation of shadcn components can be found in the url:
+https://www.shadcn-vue.com/docs/introduction.html
+even if you need shadcn components that are not in the components/ui folder, use it, later manually it will be added to the project
+use icons from heroicons library
+do NOT use id parameter for HTML elements
+do NOT import shadcn componenet from @/components/ui/ we support auto import of components ui from this folder
+always add data-testid attribute to a user input component, like: button, input text, selector.....
+
+
+### File Naming Conventions
+
+- **Components**: PascalCase (`UserProfile.vue`, `ProductCard.vue`)
+- **Pages**: kebab-case (`user-profile.vue`, `product-details.vue`)
+- **Services**: Prefix with `service` (`serviceAuth.ts`, `serviceUsers.ts`, `serviceProjects.ts`)
+- **Stores**: Prefix with `useStore` (`useStoreAuth.ts`, `useStoreUsers.ts`, `useStoreProjects.ts`)
+- **Types**: PascalCase (`User.ts`, `Product.ts`) - single file per feature
+
+### State Management
+
+1. **Use Pinia for global state**
+   ```typescript
+   // stores/useStoreAuth.ts
+   export const useStoreAuth = defineStore('auth', () => {
+     const user = ref<User | null>(null)
+     
+     const isAuthenticated = computed(() => !!user.value)
+     
+     const login = async (credentials: LoginCredentials) => {
+       // Login logic using serviceAuth
+     }
+     
+     return { user, isAuthenticated, login }
+   })
+   ```
+
+2. **Use TanStack Query for server state**
+   ```vue
+   <script setup lang="ts">
+   const { data: users, isLoading, error } = useQuery({
+     queryKey: ['users'],
+     queryFn: fetchUsers
+   })
+   </script>
+   ```
+
+3. **Keep local component state minimal**
+   - Use `ref()` for primitive values
+   - Use `reactive()` for objects when you need to maintain reactivity
+   - Prefer `ref()` over `reactive()` for better TypeScript support
+
+### Styling Guidelines
+
+1. **Use Tailwind utility classes**
+   ```vue
+   <template>
+     <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md">
+       <!-- Content -->
+     </div>
+   </template>
+   ```
+
+2. **Create reusable component variants with class composition**
+   ```vue
+   <script setup lang="ts">
+   interface IProps {
+     variant?: 'primary' | 'secondary' | 'danger'
+     size?: 'sm' | 'md' | 'lg'
+   }
+   
+   const props = withDefaults(defineProps<IProps>(), {
+     variant: 'primary',
+     size: 'md'
+   })
+   
+   const buttonClasses = computed(() => {
+     const base = 'inline-flex items-center justify-center rounded-md font-medium transition-colors'
+     const variants = {
+       primary: 'bg-blue-600 text-white hover:bg-blue-700',
+       secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+       danger: 'bg-red-600 text-white hover:bg-red-700'
+     }
+     const sizes = {
+       sm: 'px-3 py-2 text-sm',
+       md: 'px-4 py-2 text-base',
+       lg: 'px-6 py-3 text-lg'
+     }
+     
+     return `${base} ${variants[props.variant]} ${sizes[props.size]}`
+   })
+   </script>
+   ```
+
+3. **Use Tailwind animations and transitions**
+   ```vue
+   <template>
+     <div class="transform transition-all duration-300 hover:scale-105">
+       <!-- Animated content -->
+     </div>
+   </template>
+   ```
+
+### Feature-Based Architecture
+
+1. **Organize code by features, not by file types**
+   ```
+   features/
+   ├── authentication/
+   │   ├── components/
+   │   │   ├── LoginForm.vue
+   │   │   └── SignupForm.vue
+   │   ├── services.ts      # Business logic and API calls
+   │   ├── types.ts         # TypeScript definitions
+   │   └── index.ts
+   ```
+
+2. **Export feature modules through index files**
+   ```typescript
+   // features/authentication/index.ts
+   export { default as LoginForm } from './components/LoginForm.vue'
+   export { default as SignupForm } from './components/SignupForm.vue'
+   export * from './services'
+   export type * from './types'
+   ```
+
+### Error Handling
+
+1. **Use error boundaries for graceful error handling**
+   ```vue
+   <script setup lang="ts">
+   const { data, error, isError } = useQuery({
+     queryKey: ['data'],
+     queryFn: fetchData,
+     retry: 3,
+     retryDelay: 1000
+   })
+   </script>
+   
+   <template>
+     <div v-if="isError" class="text-red-600">
+       Error: {{ error?.message }}
+     </div>
+   </template>
+   ```
+
+2. **Implement proper error handling in services**
+   ```typescript
+   // features/authentication/services.ts
+   export const serviceAuth = {
+     async login(credentials: LoginCredentials): Promise<User> {
+       try {
+         const response = await fetch('/api/auth/login', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(credentials)
+         })
+         if (!response.ok) {
+           throw new Error(`Login failed: ${response.statusText}`)
+         }
+         return await response.json()
+       } catch (error) {
+         console.error('Error during login:', error)
+         throw error
+       }
+     },
+     
+     async logout(): Promise<void> {
+       try {
+         await fetch('/api/auth/logout', { method: 'POST' })
+       } catch (error) {
+         console.error('Error during logout:', error)
+         throw error
+       }
+     }
+   }
+   ```
+
+### Performance Optimization
+
+1. **Use `defineAsyncComponent` for code splitting**
+   ```typescript
+   const HeavyComponent = defineAsyncComponent(
+     () => import('./components/HeavyComponent.vue')
+   )
+   ```
+
+2. **Implement proper list rendering with keys**
+   ```vue
+   <template>
+     <div v-for="item in items" :key="item.id" class="item">
+       {{ item.name }}
+     </div>
+   </template>
+   ```
+
+3. **Use `v-memo` for expensive list items when appropriate**
+   ```vue
+   <template>
+     <div v-for="item in items" :key="item.id" v-memo="[item.id, item.updatedAt]">
+       <!-- Complex item template -->
+     </div>
+   </template>
+   ```
+
+### Testing Guidelines
+
+1. **Write component tests focusing on user interactions**
+   ```typescript
+   // tests/components/UserProfile.spec.ts
+   import { test, expect } from '@playwright/test'
+   
+   test('user can update profile information', async ({ page }) => {
+     await page.goto('/profile')
+     await page.fill('[data-testid="name-input"]', 'John Doe')
+     await page.click('[data-testid="save-button"]')
+     await expect(page.locator('[data-testid="success-message"]')).toBeVisible()
+   })
+   ```
+
+2. **Use data-testid attributes for test selectors**
+   ```vue
+   <template>
+     <button data-testid="submit-button" @click="handleSubmit">
+       Submit
+     </button>
+   </template>
+   ```
+
+### Accessibility
+
+1. **Always include proper ARIA attributes**
+   ```vue
+   <template>
+     <button
+       :aria-expanded="isOpen"
+       aria-haspopup="true"
+       @click="toggleDropdown"
+     >
+       Menu
+     </button>
+   </template>
+   ```
+
+2. **Use semantic HTML elements**
+   ```vue
+   <template>
+     <main>
+       <header>
+         <h1>Page Title</h1>
+       </header>
+       <section>
+         <article>
+           <!-- Content -->
+         </article>
+       </section>
+     </main>
+   </template>
+   ```
+
+### Internationalization
+
+1. **Always use i18n for all user-facing text**
+   ```vue
+   <template>
+     <div>
+       <h1>{{ $t('pages.dashboard.title') }}</h1>
+       <button @click="handleSave">
+         {{ $t('common.buttons.save') }}
+       </button>
+       <p>{{ $t('pages.dashboard.welcome', { name: user.name }) }}</p>
+     </div>
+   </template>
+   ```
+
+2. **Use consistent key naming for translations**
+    Literal interpolation
+    The Literal interpolation can be interpolated in the placeholder using literal string.
+
+    As an example, the following locale messages resource:
+
+
+    Special Characters
+    The following characters used in the message format syntax are processed by the compiler as special characters:
+
+    {
+    }
+    @
+    $
+    |
+    If you want to use these characters, you will need to use the Literal interpolation.
+
+   ```json
+   // locales/en.json
+   {
+     "common": {
+       "buttons": {
+         "save": "Save",
+         "cancel": "Cancel",
+         "submit": "Submit",
+         "delete": "Delete",
+         "edit": "Edit"
+       },
+       "messages": {
+         "loading": "Loading...",
+         "error": "Something went wrong",
+         "success": "Operation completed successfully"
+       }
+     },
+     "pages": {
+       "login": {
+         "title": "Sign In",
+         "form": {
+           "email": "Email Address",
+           "password": "Password"
+         }
+       },
+       "dashboard": {
+         "title": "Dashboard",
+         "welcome": "Welcome back, {name}!"
+       }
+     },
+     "features": {
+       "authentication": {
+         "loginForm": {
+           "title": "Login to your account",
+           "emailLabel": "Email",
+           "passwordLabel": "Password",
+           "submitButton": "Sign In",
+           "forgotPassword": "Forgot your password?"
+         },
+         "signupForm": {
+           "title": "Create new account",
+           "confirmPassword": "Confirm Password",
+           "submitButton": "Sign Up"
+         }
+       },
+       "users": {
+         "userProfile": {
+           "title": "User Profile",
+           "editButton": "Edit Profile",
+           "saveButton": "Save Changes"
+         },
+         "userList": {
+           "title": "Users",
+           "searchPlaceholder": "Search users...",
+           "noResults": "No users found"
+         }
+       }
+     }
+   }
+   ```
+
+3. **Create a composable for translations**
+   ```typescript
+   // composables/useI18n.ts
+   export const useI18n = () => {
+     const { t, locale } = useI18n()
+     
+     const setLocale = (newLocale: string) => {
+       locale.value = newLocale
+     }
+     
+     return { t, locale, setLocale }
+   }
+   ```
+
+4. **Feature components should have dedicated translation sections**
+   ```vue
+   <script setup lang="ts">
+   // features/authentication/components/LoginForm.vue
+   const { t } = useI18n()
+   </script>
+   
+   <template>
+     <form @submit.prevent="handleSubmit">
+       <h2>{{ t('features.authentication.loginForm.title') }}</h2>
+       <div>
+         <label>{{ t('features.authentication.loginForm.emailLabel') }}</label>
+         <input type="email" :placeholder="t('features.authentication.loginForm.emailLabel')" />
+       </div>
+       <div>
+         <label>{{ t('features.authentication.loginForm.passwordLabel') }}</label>
+         <input type="password" :placeholder="t('features.authentication.loginForm.passwordLabel')" />
+       </div>
+       <button type="submit">
+         {{ t('features.authentication.loginForm.submitButton') }}
+       </button>
+     </form>
+   </template>
+   ```
+
+## Code Generation Rules
+
+### When generating components:
+1. Always use TypeScript with proper interface definitions
+2. Include proper props validation and default values
+3. Use Tailwind classes for styling
+4. Add proper accessibility attributes
+5. Include error handling where appropriate
+6. Use composition API with `<script setup>`
+7. Follow the established folder structure
+8. Include proper TypeScript imports
+9. Always file order: <script>, <template>, <style scoped>
+
+### When generating services:
+1. Always use individual functions instead of objects for better tree shaking
+2. Include proper TypeScript typing for parameters and return values
+3. Implement comprehensive error handling
+4. Use async/await for asynchronous operations
+5. Follow RESTful API patterns when applicable
+6. Include proper logging for debugging
+
+### When generating stores:
+1. Use Pinia's composition API syntax
+2. Include proper TypeScript typing
+3. Implement error handling
+4. Use computed properties for derived state
+5. Follow the naming conventions
+6. Place in `stores/` directory
+
+### When generating composables:
+1. Start function names with "use"
+2. Include proper return types
+3. Handle errors gracefully
+4. Make them reusable and focused on single responsibility
+5. Use VueUse composables when possible
+6. Keep business logic in services, use composables for reactive state management
+
+Remember: Always prioritize code readability, maintainability, and performance. Follow Vue 3 best practices and modern JavaScript/TypeScript patterns.

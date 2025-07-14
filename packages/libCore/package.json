@@ -6,12 +6,12 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "yarn g:tsc -b",
+		"build1": "yarn g:tsc -b",
 		"lint": "eslint ."
 	},
 	"devDependencies": {
 		"@pkg/dev-config": "*",
-		"@types/node": "^20.11.20"
+		"@types/node": "^24.0.13"
 	},
 	"dependencies": {
 		"@pkg/lib-containers": "*",

@@ -1,0 +1,60 @@
+{
+  "common": {
+    "messages": {
+      "loading": "Loading...",
+      "error": "Something went wrong"
+    }
+  },
+  "features": {
+    "authentication": {
+      "loginForm": {
+        "title": "Sign In",
+        "subtitle": "Start your journey",
+        "emailLabel": "E-mail",
+        "emailPlaceholder": "example{'@'}email.com",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "submitButton": "Sign In",
+        "or": "or sign in with",
+        "noAccount": "Don't have an account?",
+        "signupLink": "Sign up"
+      }
+    },
+    "projects": {
+      "projectDetail": {
+        "title": "Project Details",
+        "overview": "Overview",
+        "description": "Description",
+        "client": "Client",
+        "status": "Status",
+        "budget": "Budget",
+        "deadline": "Deadline",
+        "progress": "Progress",
+        "createdAt": "Created",
+        "updatedAt": "Last Updated",
+        "teamMembers": "Team Members",
+        "technologies": "Technologies",
+        "tasks": "Tasks",
+        "noDescription": "No description available",
+        "noTeamMembers": "No team members assigned",
+        "noTechnologies": "No technologies specified",
+        "noTasks": "No tasks created yet",
+        "taskStatus": {
+          "pending": "Pending",
+          "in-progress": "In Progress",
+          "completed": "Completed"
+        },
+        "taskPriority": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
+        "actions": {
+          "editProject": "Edit Project",
+          "addTask": "Add Task",
+          "addTeamMember": "Add Team Member"
+        }
+      }
+    }
+  }
+}

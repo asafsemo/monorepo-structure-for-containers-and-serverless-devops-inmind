@@ -1,0 +1,44 @@
+{
+	"name": "my-app-vue",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"exec-ui": "yarn dev"
+	},
+	"devDependencies": {
+		"@heroicons/vue": "^2.2.0",
+		"@tailwindcss/vite": "^4.1.11",
+		"@tanstack/vue-query": "^5.81.5",
+		"@types/node": "24.0.10",
+		"@vitejs/plugin-vue": "^6.0.0",
+		"@vue/tsconfig": "^0.7.0",
+		"@vueuse/core": "^13.5.0",
+		"class-variance-authority": "^0.7.1",
+		"clsx": "^2.1.1",
+		"lucide-vue-next": "^0.525.0",
+		"mockjs": "^1.1.0",
+		"pinia": "^3.0.3",
+		"reka-ui": "^2.3.2",
+		"tailwind-merge": "^3.3.1",
+		"tw-animate-css": "^1.3.5",
+		"unplugin-auto-import": "^19.3.0",
+		"unplugin-vue-components": "^28.8.0",
+		"unplugin-vue-router": "^0.14.0",
+		"vite": "^7.0.3",
+		"vite-plugin-checker": "^0.10.0",
+		"vite-plugin-mock": "^3.0.2",
+		"vite-plugin-vue-layouts": "^0.11.0",
+		"vue": "^3.5.17",
+		"vue-i18n": "^11.1.9",
+		"vue-router": "^4.5.1",
+		"vue-tsc": "^3.0.1"
+	},
+	"devDependencies2222": {
+		"@vue/compiler-sfc": "^3.5.13",
+		"tailwindcss": "^4.1.5"
+	}
+}

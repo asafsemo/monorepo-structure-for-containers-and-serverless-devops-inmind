@@ -10,28 +10,28 @@
 		"runserverless": "./dist/runServerless.js"
 	},
 	"scripts": {
-		"build": "yarn g:tsc -b",
+		"build1": "yarn g:tsc -b",
 		"lint": "eslint ."
 	},
 	"devDependencies": {
 		"@pkg/dev-config": "*",
-		"@types/aws-lambda": "^8.10.134",
+		"@types/aws-lambda": "^8.10.150",
 		"@types/js-yaml": "^4.0.9",
-		"@types/node": "^20.11.20",
+		"@types/node": "^24.0.13",
 		"@types/source-map-support": "^0.5.10",
 		"aws-lambda": "^1.0.7",
 		"js-yaml": "^4.1.0"
 	},
 	"dependencies": {
-		"@fastify/busboy": "^2.1.0",
-		"@fastify/multipart": "^8.1.0",
-		"@fastify/swagger": "^8.14.0",
-		"@fastify/swagger-ui": "^3.0.0",
-		"awilix": "^10.0.1",
-		"chalk": "^5.3.0",
-		"dotenv": "^16.4.5",
-		"fastify": "^4.26.1",
-		"fastify-plugin": "^4.5.1",
+		"@fastify/busboy": "^3.1.1",
+		"@fastify/multipart": "^9.0.3",
+		"@fastify/swagger": "^9.5.1",
+		"@fastify/swagger-ui": "^5.2.3",
+		"awilix": "^12.0.5",
+		"chalk": "^5.4.1",
+		"dotenv": "^17.2.0",
+		"fastify": "^5.4.0",
+		"fastify-plugin": "^5.0.1",
 		"source-map-support": "^0.5.21"
 	}
 }

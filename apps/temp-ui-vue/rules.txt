@@ -1,0 +1,108 @@
+
+**Subject: Development Requirements for a Windsurf IDE Frontend (Vue.js 3) - Composition API (`<script setup="ts">`), `unplugin-vue-router` (with Layout Meta), Shadcn Vue, and `unplugin-auto-import`**
+
+**Goal:** To develop a user-friendly and feature-rich web frontend for a windsurf IDE using Vue.js 3, exclusively utilizing the Composition API with `<script setup="ts">` for all Vue components. Layouts will be managed using components in the `/layouts` folder, and each page in `src/pages` will specify its layout via a `<route lang="yaml">` block in its metadata. This includes leveraging `unplugin-vue-router` for automatic file-based routing from the `src/pages` folder (reading layout meta), Vue Query (Pinia Query) for data fetching and server state management, Pinia for client-side state management, Shadcn Vue for common UI components (configured in `/components/ui` and auto-imported from `/components`), and a modular feature-based architecture (under `/features`) with dedicated `components` and `composables` subfolders within each feature. The codebase will strictly adhere to senior developer coding standards throughout the implementation, fully embracing the Composition API with TypeScript.
+
+**Target Audience:** Windsurfers of all levels, from beginners to advanced riders.
+
+**I. Project Structure and Core Technologies:**
+
+  * **Framework:** Vue.js 3 (Composition API with `<script setup="ts">`)
+  * **Routing:** `unplugin-vue-router`. Routes will be automatically generated based on the file structure within the `src/pages` directory. Layouts for each page will be determined by the `<route lang="yaml">` block within the page component. All page and layout components will be written using `<script setup="ts">`.
+      * **`src/pages/[routeName]/index.vue`:** This file, using `<script setup="ts">`, will serve as the main page component for the `/[routeName]` route. It will contain a `<route lang="yaml">` block to specify the layout. Nested routes can be created by adding subdirectories within `src/pages`.
+      * **`<route lang="yaml">` Block:** Each `index.vue` (and potentially other page components) will include a YAML block like:
+        ```yaml
+        <route lang="yaml">
+        meta:
+          layout: MainMenu
+        </route>
+        ```
+        where `MainMenu` corresponds to the name of a layout component in the `/layouts` folder.
+  * **Data Fetching & Server State Management:** Vue Query (or Pinia Query). All data fetching, caching, and server state management will be handled within composables (in `/features/[feature]/composables/`) using Vue Query or Pinia Query hooks, all within a TypeScript environment.
+  * **Client-Side State Management:** Pinia. Stores will be defined using `defineStore` within composables (in `/features/[feature]/composables/` or `/store/`), leveraging TypeScript for type safety. Components using these stores will access them via `useStore()` within their `<script setup="ts">` block.
+  * **UI Components:** Shadcn Vue. Pre-built, customizable components from Shadcn Vue will be configured and potentially extended in `/components/ui` and auto-imported into Vue components (written with `<script setup="ts">`) from the `/components` folder using `unplugin-auto-import`.
+  * **Layout Management:** Page structure will be defined by layout components (`.vue` files using `<script setup="ts">`) located in the `/layouts` folder (e.g., `MainMenu.vue`, `SidebarLayout.vue`, `FullScreenMapLayout.vue`). These components will use `<router-view>` to render the content of the current page.
+  * **Feature Organization:** All application features (e.g., wind data, location management, session logging, gear management) will be encapsulated within individual folders under the `/features` directory. Each feature folder will contain:
+      * **`components`:** All UI components specific to that feature. These `.vue` files will exclusively use `<script setup="ts">` and will primarily consume data and state from their feature's `composables` folder, utilizing auto-imported Shadcn Vue components for styling.
+      * **`composables`:** All business logic, API calls (using Vue Query/Pinia Query hooks), Pinia store definitions, and computed properties related to that feature will be implemented as composable functions within `.ts` files, fully leveraging TypeScript's type system.
+
+**II. Core Functionality (Organized by Feature):**
+
+  * **Wind Data Feature (`/features/wind-data`):**
+
+      * **`components`:** UI components (using `<script setup="ts">`) for displaying wind data visualizations, location selection UI, etc., built with auto-imported Shadcn Vue primitives. The main view component will be `index.vue` in `src/pages/wind-data/`, which will contain a `<route>` block specifying its layout.
+      * **`composables`:** TypeScript composables for fetching wind data (Vue Query/Pinia Query), defining Pinia stores for selected locations or display preferences, and any data transformation or computed properties related to wind information.
+      * **Routing (`src/pages/wind-data`):**
+          * **`index.vue`:** This `<script setup="ts">` component will serve as the main view for the `/wind-data` route. Its `<route>` block will determine which layout from `/layouts` (e.g., `MainMenu.vue`) will wrap it. The component will import and utilize components from `features/wind-data/components` and interact with the TypeScript composables.
+      * **Data Sources:** Integration with [Specify desired data sources - e.g., Windfinder API, PredictWind API].
+      * **Data Display:** Display of wind data within `<script setup="ts">` components in `features/wind-data/components` using auto-imported Shadcn Vue.
+      * **Location Selection:** UI components (in `<script setup="ts">`) using auto-imported Shadcn Vue, with state managed by Pinia stores defined in TypeScript composables.
+      * **Visualization:** Implementation within `<script setup="ts">` components using appropriate libraries and styled with auto-imported Shadcn Vue.
+      * **Caching:** Handled by Vue Query/Pinia Query within TypeScript composables in `features/wind-data/composables`.
+
+  * **Location Management Feature (`/features/location-management`):**
+
+      * **`components`:** UI components (using `<script setup="ts">`) built with auto-imported Shadcn Vue for maps, lists, search, and forms. The main view is `index.vue` in `src/pages/locations/`, with its own `<route>` block.
+      * **`composables`:** TypeScript composables for fetching/mutating location data (Vue Query/Pinia Query), Pinia stores for map state, and proximity alert logic.
+      * **Routing (`src/pages/locations`):**
+          * **`index.vue`:** The main `<script setup="ts">` component for `/locations/`. Its `<route>` block will specify the layout (e.g., `FullScreenMapLayout.vue`).
+      * **Saving Locations:** UI (in `<script setup="ts">` with auto-imported Shadcn Vue) interacting with Pinia stores and Vue Query/Pinia Query mutations in TypeScript composables.
+      * **Map Integration:** `<script setup="ts">` components integrating map libraries, potentially using auto-imported Shadcn Vue for surrounding UI, with state in TypeScript composables.
+      * **Proximity Alerts (Optional):** Logic in TypeScript composables, UI in `<script setup="ts">` components using auto-imported Shadcn Vue.
+      * **Data Persistence:** Vue Query/Pinia Query mutations within TypeScript composables.
+
+  * **Session Logging Feature (`/features/session-logging`):**
+
+      * **`components`:** UI components (using `<script setup="ts">`) built with auto-imported Shadcn Vue for logging, lists, calendars, and details. Main view in `src/pages/sessions/index.vue`, with a `<route>` block.
+      * **`composables`:** TypeScript composables for CRUD operations (Vue Query/Pinia Query), Pinia stores for form/filter state, and GPS handling logic.
+      * **Routing (`src/pages/sessions`):**
+          * **`index.vue`:** The main `<script setup="ts">` component for `/sessions/`. Its `<route>` block will specify the layout (e.g., `DefaultLayout.vue`).
+      * **Manual Logging:** UI (in `<script setup="ts">` with auto-imported Shadcn Vue) driven by Pinia stores in TypeScript composables, persistence via Vue Query/Pinia Query in TypeScript composables.
+      * **GPS Integration (Future):** Logic in TypeScript composables, UI in `<script setup="ts">` components using auto-imported Shadcn Vue, state in Pinia stores (TypeScript).
+      * **Data Display:** Fetching in TypeScript composables (Vue Query/Pinia Query), display in `<script setup="ts">` components using auto-imported Shadcn Vue.
+      * **Session Details:** Fetching and display within `<script setup="ts">` components and TypeScript composables.
+      * **Data Export (Optional):** Logic in TypeScript composables, UI trigger (auto-imported Shadcn Vue button) in a `<script setup="ts">` component.
+
+  * **Gear Management Feature (`/features/gear-management`):**
+
+      * **`components`:** UI (using `<script setup="ts">`) with auto-imported Shadcn Vue for lists, forms, and details. Main view in `src/pages/gear/index.vue`, with a `<route>` block.
+      * **`composables`:** TypeScript composables for gear inventory (Vue Query/Pinia Query), Pinia stores for form state, and usage tracking logic.
+      * **Routing (`src/pages/gear`):**
+          * **`index.vue`:** The main `<script setup="ts">` component for `/gear/`. Its `<route>` block will specify the layout (e.g., `DefaultLayout.vue`).
+      * **Inventory Tracking:** UI (in `<script setup="ts">` with auto-imported Shadcn Vue) managed by Pinia stores in TypeScript composables, persistence via Vue Query/Pinia Query in TypeScript composables.
+      * **Gear Details:** State and UI (using auto-imported Shadcn Vue) managed within `<script setup="ts">` components and TypeScript composables.
+      * **Usage Logging (Optional):** Logic in TypeScript composables, UI in `<script setup="ts">` components (using auto-imported Shadcn Vue).
+
+**III. Routing (`src/pages` folder) & Layouts (`/layouts` folder):**
+
+  * The `src/pages` folder will contain sub-directories named after each top-level route (e.g., `wind-data`, `locations`, `sessions`, `gear`). All `.vue` files within this structure will use `<script setup="ts">` and include a `<route lang="yaml">` block to define their layout.
+
+  * Within each route folder in `src/pages`:
+
+      * **`index.vue`:** The primary `<script setup="ts">` component for the route, containing the layout metadata within its `<route>` block. It will utilize feature components and interact with TypeScript composables.
+
+  * Layout components in the `/layouts` folder (e.g., `MainMenu.vue`, `SidebarLayout.vue`, `FullScreenMapLayout.vue`) will be defined using `<script setup="ts">` and will contain the `<router-view>` component to render the current page's content. The names used in the `<route lang="yaml">` blocks must match the names of these layout components.
+
+**IV. UI Components (`/components` and `/components/ui` folders):**
+
+  * Shadcn Vue components will be installed and potentially wrapped or extended within the `/components/ui` folder.
+  * `unplugin-auto-import` will be configured to automatically import components from the `/components` directory, making them available for use within the `<script setup="ts">` blocks of your Vue components without explicit imports.
+
+**V. State Management (Pinia Specifics):**
+
+  * Pinia stores will be defined using `defineStore` within TypeScript composables.
+  * Vue components (using `<script setup="ts">`) will access and interact with these Pinia stores using the `useStore()` hook.
+
+**VI. Non-Functional Requirements:**
+
+  * (As previously defined, emphasizing performance, lazy loading, and efficient use of auto-imported Shadcn Vue components within a TypeScript and Composition API context, now also considering the performance implications of route metadata processing).
+
+**VII. Specific Considerations/Questions:**
+
+  * (As previously defined, now with a specific focus on ensuring `unplugin-vue-router` is correctly configured to read and utilize the layout metadata from the `<route lang="yaml">` blocks in the page components, and that the names in the metadata accurately correspond to the layout components in the `/layouts` folder).
+
+**VIII. Additional Notes:**
+
+  * [Include any other relevant information, design mockups, or API documentation if available.]
+
+This version now incorporates the layout definition within the page components using the `<route lang="yaml">` block, which is a common pattern with `unplugin-vue-router`. Ensure that your `unplugin-vue-router` configuration is set up to correctly parse and handle this metadata to apply the appropriate layouts.

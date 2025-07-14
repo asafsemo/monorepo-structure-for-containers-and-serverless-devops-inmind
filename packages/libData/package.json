@@ -6,7 +6,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "yarn g:tsc -b",
+		"build1": "yarn g:tsc -b",
 		"lint": "eslint ."
 	},
 	"devDependencies": {

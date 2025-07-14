@@ -3,5 +3,5 @@
     "ext": "json, ts, proto",
     "ignore": ["node_modules", "coverage", "**/dist/*"],
     "restartable": "rs",
-    "exec": "yarn install && yarn build && node run-dev.js"
+    "exec": "yarn build && node run-dev.js"
 }

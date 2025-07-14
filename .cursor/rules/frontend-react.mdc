@@ -1,0 +1,873 @@
+---
+description: Working on a react ui project
+globs: 
+alwaysApply: false
+---
+## AI Response Format Rule
+**IMPORTANT**: When answering any question using these rules, always start your response with:
+**⚛️ React Code Generation** 
+
+This indicates that the response follows the React senior developer guidelines defined in this rules file.
+
+## Agent Mode Instructions
+Please avoid writing the code changes in the chat panel when the code was implemented in a file
+CRITICAL FOR AGENT MODE: When operating in agent mode, you MUST:
+
+CREATE FILES - Always create actual files in the project structure, don't just describe what should be created
+UPDATE FILES - Modify existing files directly instead of explaining what changes should be made
+FOLLOW FOLDER STRUCTURE - Create files in the correct directories as specified in these rules
+IMPLEMENT COMPLETE SOLUTIONS - Write full, working code implementations
+CREATE MULTIPLE FILES - When a feature requires multiple files (component, service, types, hooks), create ALL of them
+UPDATE EXISTING FILES - If changes are needed to existing files (like adding imports, updating), make those changes directly
+
+Example Agent Actions:
+
+CREATE: src/features/authentication/components/LoginForm.tsx
+CREATE: src/features/authentication/services.ts
+CREATE: src/features/authentication/types.ts
+UPDATE: src/locales/en.json (add new translations)
+CREATE: src/routes/login.tsx
+
+DO NOT just tell the user "You should create a file called..." - ACTUALLY CREATE THE FILE.
+
+## Technology Stack & Architecture
+
+### Core Technologies
+- **React 19** with TypeScript
+- **Vite** for build tooling
+- **TanStack Router** for routing
+- **TanStack Query** for server state management
+- **Jotai** for client state management
+- **Tailwind CSS** for styling and animations
+- **Shadcn/ui** for UI components
+- **React Hook Form** for form handling
+- **Zod** for validation
+- **Vitest** for unit testing
+- **Playwright** for E2E testing
+
+### Folder Structure
+```
+src/
+├── routes/           # Page components
+├── components/
+│   └── ui/         # Shadcn components
+├── features/       # Feature-based modules
+│   └── [feature-name]/
+│       ├── components/
+│       ├── hooks/         # Custom hooks
+│       ├── services.ts    # Business logic and API calls
+│       ├── types.ts       # TypeScript type definitions
+│       └── index.ts
+├── layouts/        # Layout components
+├── hooks/          # Shared custom hooks
+├── locales/        # i18n translations (JSON)
+├── utils/          # Utility functions
+└── assets/         # Static assets (images, JS)
+```
+
+### When generating custom hooks:
+* Start function names with "use"
+* Include proper return types
+* Handle errors gracefully
+* Make them reusable and focused on single responsibility
+* Use React's built-in hooks when possible
+* Keep business logic in services, use hooks for reactive state management
+
+### When generating pages:
+* Use kebab-case file naming
+* Include proper meta tags and SEO considerations  
+* Implement proper loading states
+* Use layouts when appropriate
+* Include error boundaries
+* Import services from feature modules for data operations
+* Use TanStack Router for navigation and route definitions
+
+### When generating types:
+* Use single `types.ts` file per feature
+* Export interfaces and types clearly
+* Use proper TypeScript conventions (PascalCase for interfaces)
+* Include JSDoc comments for complex types
+* Extend base types when appropriate
+* In features use the types from types.ts, and don't recreate them
+
+## Code Quality & Best Practices
+
+### React Component Guidelines
+
+1. **Always use TypeScript with proper interface definitions**
+   ```tsx
+   interface UserProfileProps {
+     user: User
+     isEditing?: boolean
+     onSave?: (user: User) => void
+   }
+   
+   export const UserProfile = (props: UserProfileProps) => {
+     const { 
+       user, 
+       isEditing = false, 
+       onSave 
+     } = props
+     
+     // Component logic here
+     return (
+       <div>
+         {/* Component JSX */}
+       </div>
+     )
+   }
+   ```
+
+2. **Use proper props destructuring and default values**
+   ```tsx
+   interface ButtonProps {
+     variant?: 'primary' | 'secondary' | 'danger'
+     size?: 'sm' | 'md' | 'lg'
+     disabled?: boolean
+     onClick?: () => void
+     children: React.ReactNode
+   }
+   
+   export const Button = (props: ButtonProps) => {
+     const { 
+       variant = 'primary',
+       size = 'md',
+       disabled = false,
+       onClick,
+       children 
+     } = props
+     
+     // Component implementation
+   }
+   ```
+
+3. **Use custom hooks for reusable logic**
+   ```tsx
+   // hooks/useAuth.ts
+   export const useAuth = () => {
+     const [user, setUser] = useState<User | null>(null)
+     const [loading, setLoading] = useState(true)
+     
+     const login = useCallback(async (credentials: LoginCredentials) => {
+       setLoading(true)
+       try {
+         const userData = await serviceAuth.login(credentials)
+         setUser(userData)
+       } catch (error) {
+         console.error('Login failed:', error)
+         throw error
+       } finally {
+         setLoading(false)
+       }
+     }, [])
+     
+     return { user, loading, login }
+   }
+   ```
+
+4. **Prefer function components over class components**
+   - Use hooks for state and lifecycle management
+   - Create custom hooks for reusable logic
+   - Use React.memo for performance optimization when needed
+
+Mandate shadcn/ui usage for all UI primitives.
+Always use shadcn/ui components for form elements, buttons, cards, etc., instead of native HTML elements.
+Documentation of shadcn components can be found at:
+https://ui.shadcn.com/docs/installation
+Even if you need shadcn components that are not in the components/ui folder, use them, they will be added manually later
+Use icons from lucide-react library
+Do NOT use id parameter for HTML elements unless absolutely necessary
+Always add data-testid attribute to user input components, like: button, input, select, etc.
+
+### File Naming Conventions
+
+- **Components**: kebab-case (`UserProfile.tsx`, `ProductCard.tsx`)
+- **Pages**: kebab-case (`UserProfile.tsx`, `ProductDetails.tsx`)
+- **Services**: Prefix with `service` (`serviceAuth.ts`, `serviceUsers.ts`, `serviceProjects.ts`)
+- **Hooks**: Prefix with `use` (`useAuth.ts`, `useLocalStorage.ts`)
+- **Types**: PascalCase (`User.ts`, `Product.ts`) - single file per feature
+- **Utils**: camelCase (`formatDate.ts`, `apiClient.ts`)
+
+### State Management
+
+1. **Use Jotai atoms in components**
+   ```tsx
+   import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+   
+   export const LoginForm = () => {
+     const [user, setUser] = useAtom($userAtom)
+     const isAuthenticated = useAtomValue($isAuthenticatedAtom)
+     const login = useSetAtom($loginAtom)
+     
+     const handleSubmit = async (credentials: LoginCredentials) => {
+       try {
+         await login(credentials)
+         // User is automatically updated via the atom
+       } catch (error) {
+         // Handle error
+       }
+     }
+     
+     return (
+       <div>
+         {isAuthenticated ? (
+           <p>Welcome, {user?.name}!</p>
+         ) : (
+           <form onSubmit={handleSubmit}>
+             {/* Form fields */}
+           </form>
+         )}
+       </div>
+     )
+   }
+   ```
+
+2. **Use TanStack Query for server state**
+   ```tsx
+   import { useQuery } from '@tanstack/react-query'
+   
+   export const UserList = () => {
+     const { data: users, isLoading, error } = useQuery({
+       queryKey: ['users'],
+       queryFn: serviceUsers.getAll
+     })
+     
+     if (isLoading) return <div>Loading...</div>
+     if (error) return <div>Error: {error.message}</div>
+     
+     return (
+       <div>
+         {users?.map(user => (
+           <UserCard key={user.id} user={user} />
+         ))}
+       </div>
+     )
+   }
+   ```
+
+3. **Use TanStack Router for navigation**
+   ```tsx
+   // routes/index.tsx
+   import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
+   import { RootLayout } from '@/layouts/RootLayout'
+   import { HomePage } from '@/routes/HomePage'
+   import { LoginPage } from '@/routes/LoginPage'
+   
+   const rootRoute = createRootRoute({
+     component: RootLayout,
+   })
+   
+   const indexRoute = createRoute({
+     getParentRoute: () => rootRoute,
+     path: '/',
+     component: HomePage,
+   })
+   
+   const loginRoute = createRoute({
+     getParentRoute: () => rootRoute,
+     path: '/login',
+     component: LoginPage,
+   })
+   
+   const routeTree = rootRoute.addChildren([indexRoute, loginRoute])
+   
+   export const router = createRouter({ routeTree })
+   
+   // In components, use router hooks
+   import { useNavigate, useRouter } from '@tanstack/react-router'
+   
+   export const NavigationExample = () => {
+     const navigate = useNavigate()
+     const router = useRouter()
+     
+     const handleLogin = () => {
+       navigate({ to: '/login' })
+     }
+     
+     return <button onClick={handleLogin}>Go to Login</button>
+   }
+   ```
+
+4. **Keep local component state minimal**
+   - Use `useState` for simple state
+   - Use `useReducer` for complex state logic
+   - Use `useCallback` and `useMemo` for performance optimization
+   - Use Jotai atoms for shared state across components
+
+
+   ### Standard Atoms Pattern for Services
+
+    Each feature's services.ts should include these standard atoms:
+    typescript// features/[feature-name]/services.ts
+    ```ts
+    import { atom, useAtom, useSetAtom } from 'jotai'
+
+    // Atoms (keep these as regular atoms)
+    export const $loadingAtom = atom<boolean>(false)
+    export const $errorAtom = atom<string | null>(null)
+    export const $userAtom = atom<User | null>(null)
+
+    // Regular function that uses atoms
+    export const useAuthLogin = () => {
+      const setLoading = useSetAtom($loadingAtom)
+      const setError = useSetAtom($errorAtom)
+      const setUser = useSetAtom($userAtom)
+
+      const login = async (credentials: LoginCredentials): Promise<User> => {
+        setLoading(true)
+        setError(null)
+        
+        try {
+          const user = await authLogin(credentials)
+          setUser(user)
+          return user
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Login failed'
+          setError(errorMessage)
+          throw error
+        } finally {
+          setLoading(false)
+        }
+      }
+
+      return { login }
+    }
+    ```
+
+    ### Component Integration with Service Atoms
+    Components should use the atoms from services:
+    tsx// features/authentication/components/LoginForm.tsx
+
+    ```ts
+    import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+    import { $loginAtom, $loadingAtom, $errorAtom } from '../services'
+
+    export const LoginForm = () => {
+      const login = useSetAtom($loginAtom)
+      const loading = useAtomValue($loadingAtom)
+      const error = useAtomValue($errorAtom)
+      
+      const handleSubmit = async (credentials: LoginCredentials) => {
+        try {
+          await login(credentials)
+          // Navigation or success handling
+        } catch (error) {
+          // Error is already set in the atom
+        }
+      }
+      
+      return (
+        <form onSubmit={handleSubmit}>
+          {error && <div className="text-red-500">{error}</div>}
+          {/* Form fields */}
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </Button>
+        </form>
+      )
+    }
+    ```
+
+### Form Handling
+
+1. **Use React Hook Form with Zod validation**
+   ```tsx
+   import { useForm } from 'react-hook-form'
+   import { zodResolver } from '@hookform/resolvers/zod'
+   import { z } from 'zod'
+   
+   const loginSchema = z.object({
+     email: z.string().email('Invalid email address'),
+     password: z.string().min(6, 'Password must be at least 6 characters')
+   })
+   
+   type LoginFormData = z.infer<typeof loginSchema>
+   
+   export const LoginForm = () => {
+     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
+       resolver: zodResolver(loginSchema)
+     })
+     
+     const onSubmit = async (data: LoginFormData) => {
+       try {
+         await serviceAuth.login(data)
+       } catch (error) {
+         console.error('Login failed:', error)
+       }
+     }
+     
+     return (
+       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+         <div>
+           <Input
+             {...register('email')}
+             type="email"
+             placeholder="Email"
+             data-testid="email-input"
+           />
+           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+         </div>
+         
+         <div>
+           <Input
+             {...register('password')}
+             type="password"
+             placeholder="Password"
+             data-testid="password-input"
+           />
+           {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+         </div>
+         
+         <Button 
+           type="submit" 
+           disabled={isSubmitting}
+           data-testid="submit-button"
+         >
+           {isSubmitting ? 'Logging in...' : 'Login'}
+         </Button>
+       </form>
+     )
+   }
+   ```
+
+### Styling Guidelines
+
+1. **Use Tailwind utility classes**
+   ```tsx
+   interface ProductCardProps {
+     product: Product
+   }
+   
+   export const ProductCard = (props: ProductCardProps) => {
+     const { product } = props
+     
+     return (
+       <div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+         <div className="flex-1">
+           <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
+           <p className="text-gray-600">{product.description}</p>
+         </div>
+         <div className="ml-4">
+           <span className="text-xl font-bold text-blue-600">${product.price}</span>
+         </div>
+       </div>
+     )
+   }
+   ```
+
+2. **Create reusable component variants with className composition**
+   ```tsx
+   import { cn } from '@/lib/utils'
+   
+   interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+     variant?: 'primary' | 'secondary' | 'danger'
+     size?: 'sm' | 'md' | 'lg'
+   }
+   
+   export const Button = (props: ButtonProps) => {
+     const { 
+       variant = 'primary',
+       size = 'md',
+       className,
+       children,
+       ...restProps 
+     } = props
+     
+     const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
+     
+     const variantClasses = {
+       primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+       secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
+       danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+     }
+     
+     const sizeClasses = {
+       sm: 'px-3 py-2 text-sm',
+       md: 'px-4 py-2 text-base',
+       lg: 'px-6 py-3 text-lg'
+     }
+     
+     return (
+       <button
+         className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+         {...restProps}
+       >
+         {children}
+       </button>
+     )
+   }
+   ```
+
+3. **Use Tailwind animations and transitions**
+   ```tsx
+   export const AnimatedCard = () => {
+     return (
+       <div className="transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+         {/* Card content */}
+       </div>
+     )
+   }
+   ```
+
+### Feature-Based Architecture
+
+1. **Organize code by features, not by file types**
+   ```
+   features/
+   ├── authentication/
+   │   ├── components/
+   │   │   ├── login-form.tsx
+   │   │   └── signup-form.tsx
+   │   ├── hooks/
+   │   │   └── useAuth.ts
+   │   ├── services.ts      # Business logic and API calls
+   │   ├── types.ts         # TypeScript definitions
+   │   └── index.ts
+   ```
+
+2. **Export feature modules through index files**
+   ```typescript
+   // features/authentication/index.ts
+   export { LoginForm } from './components/login-form'
+   export { SignupForm } from './components/signup-form'
+   export { useAuth } from './hooks/useAuth'
+   export * from './services'
+   export type * from './types'
+   ```
+
+### Error Handling
+
+1. **Use Error Boundaries with TanStack Router**
+   ```tsx
+   import { ErrorBoundary } from 'react-error-boundary'
+   import { RouterProvider } from '@tanstack/react-router'
+   import { router } from '@/routes'
+   
+   interface ErrorFallbackProps {
+     error: Error
+     resetErrorBoundary: () => void
+   }
+   
+   export const ErrorFallback = (props: ErrorFallbackProps) => {
+     const { error, resetErrorBoundary } = props
+     
+     return (
+       <div className="text-center p-8">
+         <h2 className="text-xl font-bold text-red-600 mb-4">Something went wrong</h2>
+         <p className="text-gray-600 mb-4">{error.message}</p>
+         <Button onClick={resetErrorBoundary}>Try again</Button>
+       </div>
+     )
+   }
+   
+   export const App = () => {
+     return (
+       <ErrorBoundary FallbackComponent={ErrorFallback}>
+         <RouterProvider router={router} />
+       </ErrorBoundary>
+     )
+   }
+   ```
+
+2. **Implement proper error handling in services**
+   ```typescript
+   // features/authentication/services.ts
+    export function async authLogin(credentials: LoginCredentials): Promise<User> {
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credentials)
+        })
+        
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.message || `Login failed: ${response.statusText}`)
+        }
+        
+        return await response.json()
+      } catch (error) {
+        console.error('Error during login:', error)
+        throw error
+      }
+    };
+     
+    export function async authLogout(): Promise<void> {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' })
+      } catch (error) {
+        console.error('Error during logout:', error)
+        throw error
+      }
+    };
+   ```
+
+### Performance Optimization
+
+1. **Use React.memo for expensive components**
+   ```tsx
+   import { memo } from 'react'
+   
+   interface ExpensiveComponentProps {
+     data: ComplexData
+   }
+   
+   export const ExpensiveComponent = memo((props: ExpensiveComponentProps) => {
+     const { data } = props
+     
+     // Expensive rendering logic
+     return <div>{/* Complex UI */}</div>
+   })
+   
+   ExpensiveComponent.displayName = 'ExpensiveComponent'
+   ```
+
+2. **Use useMemo and useCallback appropriately**
+   ```tsx
+   interface UserListProps {
+     users: User[]
+   }
+   
+   export const UserList = (props: UserListProps) => {
+     const { users } = props
+     
+     const sortedUsers = useMemo(() => {
+       return [...users].sort((a, b) => a.name.localeCompare(b.name))
+     }, [users])
+     
+     const handleUserClick = useCallback((userId: string) => {
+       // Handle user click
+     }, [])
+     
+     return (
+       <div>
+         {sortedUsers.map(user => (
+           <UserCard 
+             key={user.id} 
+             user={user} 
+             onClick={handleUserClick}
+           />
+         ))}
+       </div>
+     )
+   }
+   ```
+
+3. **Implement proper list rendering with keys**
+   ```tsx
+   interface ItemListProps {
+     items: Item[]
+   }
+   
+   export const ItemList = (props: ItemListProps) => {
+     const { items } = props
+     
+     return (
+       <div>
+         {items.map(item => (
+           <ItemCard key={item.id} item={item} />
+         ))}
+       </div>
+     )
+   }
+   ```
+
+### Testing Guidelines
+
+1. **Write component tests focusing on user interactions**
+   ```typescript
+   // tests/components/UserProfile.spec.ts
+   import { test, expect } from '@playwright/test'
+   
+   test('user can update profile information', async ({ page }) => {
+     await page.goto('/profile')
+     await page.fill('[data-testid="name-input"]', 'John Doe')
+     await page.click('[data-testid="save-button"]')
+     await expect(page.locator('[data-testid="success-message"]')).toBeVisible()
+   })
+   ```
+
+2. **Use data-testid attributes for test selectors**
+   ```tsx
+   export const SubmitButton = () => {
+     return (
+       <Button data-testid="submit-button" onClick={handleSubmit}>
+         Submit
+       </Button>
+     )
+   }
+   ```
+
+### Accessibility
+
+1. **Always include proper ARIA attributes**
+   ```tsx
+   export const DropdownMenu = () => {
+     const [isOpen, setIsOpen] = useState(false)
+     
+     return (
+       <div>
+         <button
+           aria-expanded={isOpen}
+           aria-haspopup="true"
+           onClick={() => setIsOpen(!isOpen)}
+         >
+           Menu
+         </button>
+         {isOpen && (
+           <div role="menu" aria-orientation="vertical">
+             {/* Menu items */}
+           </div>
+         )}
+       </div>
+     )
+   }
+   ```
+
+2. **Use semantic HTML elements**
+   ```tsx
+   export const PageLayout = () => {
+     return (
+       <main>
+         <header>
+           <h1>Page Title</h1>
+         </header>
+         <section>
+           <article>
+             {/* Content */}
+           </article>
+         </section>
+       </main>
+     )
+   }
+   ```
+
+### Internationalization
+
+1. **Use react-i18next for all user-facing text**
+   ```tsx
+   import { useTranslation } from 'react-i18next'
+   
+   export const LoginForm = () => {
+     const { t } = useTranslation()
+     
+     return (
+       <div>
+         <h1>{t('pages.login.title')}</h1>
+         <Button onClick={handleSubmit}>
+           {t('common.buttons.submit')}
+         </Button>
+         <p>{t('pages.login.welcome', { name: user.name })}</p>
+       </div>
+     )
+   }
+   ```
+
+2. **Use consistent key naming for translations**
+   ```json
+   {
+     "common": {
+       "buttons": {
+         "save": "Save",
+         "cancel": "Cancel",
+         "submit": "Submit",
+         "delete": "Delete",
+         "edit": "Edit"
+       },
+       "messages": {
+         "loading": "Loading...",
+         "error": "Something went wrong",
+         "success": "Operation completed successfully"
+       }
+     },
+     "pages": {
+       "login": {
+         "title": "Sign In",
+         "welcome": "Welcome back, {{name}}!",
+         "form": {
+           "email": "Email Address",
+           "password": "Password"
+         }
+       },
+       "dashboard": {
+         "title": "Dashboard"
+       }
+     },
+     "features": {
+       "authentication": {
+         "loginForm": {
+           "title": "Login to your account",
+           "emailLabel": "Email",
+           "passwordLabel": "Password",
+           "submitButton": "Sign In",
+           "forgotPassword": "Forgot your password?"
+         },
+         "signupForm": {
+           "title": "Create new account",
+           "confirmPassword": "Confirm Password",
+           "submitButton": "Sign Up"
+         }
+       },
+       "users": {
+         "userProfile": {
+           "title": "User Profile",
+           "editButton": "Edit Profile",
+           "saveButton": "Save Changes"
+         },
+         "userList": {
+           "title": "Users",
+           "searchPlaceholder": "Search users...",
+           "noResults": "No users found"
+         }
+       }
+     }
+   }
+   ```
+
+3. **Create a custom hook for translations**
+   ```typescript
+   // hooks/useI18n.ts
+   import { useTranslation } from 'react-i18next'
+   
+   export const useI18n = () => {
+     const { t, i18n } = useTranslation()
+     
+     const changeLanguage = (lng: string) => {
+       i18n.changeLanguage(lng)
+     }
+     
+     return { t, changeLanguage, currentLanguage: i18n.language }
+   }
+   ```
+
+## Code Generation Rules
+
+### When generating components:
+1. Always use TypeScript with proper interface definitions
+2. Include proper props validation and default values
+3. Use Tailwind classes for styling
+4. Add proper accessibility attributes
+5. Include error handling where appropriate
+6. Use functional components with hooks
+7. Follow the established folder structure
+8. Include proper TypeScript imports
+9. Do NOT use React.FC type annotation
+10. Use named exports instead of default exports
+
+### When generating services:
+1. Always use individual functions instead of objects for better tree shaking
+2. Include proper TypeScript typing for parameters and return values
+3. Implement comprehensive error handling
+4. Use async/await for asynchronous operations
+5. Follow RESTful API patterns when applicable
+6. Include proper logging for debugging
+
+### When generating custom hooks:
+1. Start function names with "use"
+2. Include proper return types
+3. Handle errors gracefully
+4. Make them reusable and focused on single responsibility
+5. Use React's built-in hooks appropriately
+6. Keep business logic in services, use hooks for reactive state management
+
+Remember: Always prioritize code readability, maintainability, and performance. Follow React best practices and modern JavaScript/TypeScript patterns.

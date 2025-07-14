@@ -1,0 +1,60 @@
+{
+  "common": {
+    "messages": {
+      "loading": "Loading...",
+      "error": "Something went wrong"
+    }
+  },
+  "features": {
+    "authentication": {
+      "loginForm": {
+        "title": "Sign In",
+        "subtitle": "Start your journey",
+        "emailLabel": "E-mail",
+        "emailPlaceholder": "example@email.com",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "submitButton": "Sign In",
+        "or": "or sign in with",
+        "noAccount": "Don't have an account?",
+        "signupLink": "Sign up"
+      }
+    },
+    "projects": {
+      "projectDetail": {
+        "title": "פרטי פרויקט",
+        "overview": "סקירה כללית",
+        "description": "תיאור",
+        "client": "לקוח",
+        "status": "סטטוס",
+        "budget": "תקציב",
+        "deadline": "מועד יעד",
+        "progress": "התקדמות",
+        "createdAt": "נוצר",
+        "updatedAt": "עודכן לאחרונה",
+        "teamMembers": "חברי צוות",
+        "technologies": "טכנולוגיות",
+        "tasks": "משימות",
+        "noDescription": "אין תיאור זמין",
+        "noTeamMembers": "אין חברי צוות מוקצים",
+        "noTechnologies": "אין טכנולוגיות מוגדרות",
+        "noTasks": "אין משימות שנוצרו עדיין",
+        "taskStatus": {
+          "pending": "ממתין",
+          "in-progress": "בעבודה",
+          "completed": "הושלם"
+        },
+        "taskPriority": {
+          "low": "נמוך",
+          "medium": "בינוני",
+          "high": "גבוה"
+        },
+        "actions": {
+          "editProject": "ערוך פרויקט",
+          "addTask": "הוסף משימה",
+          "addTeamMember": "הוסף חבר צוות"
+        }
+      }
+    }
+  }
+}

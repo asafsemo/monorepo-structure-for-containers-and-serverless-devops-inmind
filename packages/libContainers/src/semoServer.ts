@@ -147,7 +147,7 @@ export class SemoServer extends ParentBaseObject {
 		const funcName = `${CLASSNAME} - runFunctionsOnServices`;
 		const { logger } = this.extractOptions(funcName, options);
 
-		for (const key of numberKeys) {
+		for await (const key of numberKeys) {
 			const names = this.services.get(key);
 			if (!names?.length) {
 				continue;

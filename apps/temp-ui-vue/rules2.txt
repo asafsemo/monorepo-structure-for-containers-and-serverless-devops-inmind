@@ -1,0 +1,106 @@
+**Subject: Development Requirements for a Windsurf IDE Frontend (React 19)**
+
+**Goal:** To develop a user-friendly and feature-rich web frontend for a windsurf IDE using React 19, 
+leveraging TanStack Router for file-based routing (with route logic and component loading organized into route-named folders within `/routes`), 
+TanStack Query for data fetching and server state management, 
+Jotai for client-side state management, 
+Shadcn UI for common UI components (in `/components`), 
+consistent page layouts defined in the `/layouts` folder, and a modular feature-based architecture (under `/features`) with dedicated `components` and `services` subfolders within each feature. 
+The codebase should adhere to senior developer coding standards throughout the implementation.
+
+**Target Audience:** Windsurfers of all levels, from beginners to advanced riders.
+
+**I. Project Structure and Core Technologies:**
+
+* **Framework:** React 19
+* **Routing:** TanStack Router. The `/routes` folder will contain a directory for each top-level route and any nested routes. Within each route folder:
+    * **`index.tsx`:** This file will serve as the entry point for the route, responsible for importing and rendering the main page view component for that route. This component will typically come from the corresponding feature's `components` folder, orchestrating the display of feature-specific UI elements and data. Route-specific logic, such as initial data pre-fetching or redirection, can be handled within this file or by utility functions it calls.
+    * **`__layout.tsx` (Optional):** If the route (or a group of nested routes within the folder) uses a specific layout, a `__layout.tsx` file will be present. This file will import the desired layout component from the `/layouts` folder and wrap the `index.tsx` (or nested route `index.tsx` files) with it.
+* **Data Fetching & Server State Management:** TanStack Query (all data fetching, caching, and interaction with server-side data will be managed using TanStack Query, primarily within the `services` folder of each feature).
+* **Client-Side State Management:** Jotai (for managing client-specific UI state that is not directly tied to server data). Atoms will be managed within the `services` folder of each feature or a dedicated `/state` directory for global state.
+* **UI Components:** Shadcn UI (utilize pre-built, customizable components from Shadcn UI, located in the global `/components` folder for common, reusable UI elements).
+* **Layout Management:** Page structure will be defined by layout components located in the `/layouts` folder. The `__layout.tsx` files within the `/routes` structure will specify which layout to use for the corresponding routes.
+* **Feature Organization:** All application features (e.g., wind data, location management, session logging, gear management) will be encapsulated within individual folders under the `/features` directory. Each feature folder will contain:
+    * **`components`:** All UI components specific to that feature. These components will primarily consume data and state managed within the feature's `services` folder and utilize Shadcn UI components (from `/components`) for styling.
+    * **`services`:** All business logic, API calls (using TanStack Query hooks), Jotai atom definitions, and computed fields related to that feature.
+
+**II. Core Functionality (Organized by Feature):**
+
+* **Wind Data Feature (`/features/wind-data`):**
+    * **`components`:** UI components for displaying wind data visualizations, location selection UI, etc. The main view component will be imported and rendered by `/routes/wind-data/index.tsx`.
+    * **`services`:** Logic for fetching wind data (TanStack Query), defining Jotai atoms for selected locations or display preferences, and any data transformation or computed fields related to wind information.
+    * **Routing (`/routes/wind-data`):**
+        * **`index.tsx`:** Imports and renders the main wind data view component from `features/wind-data/components`, potentially fetching initial data using services.
+        * **`__layout.tsx` (Optional):** Imports and uses a specific layout from `/layouts` if needed for this route.
+    * **Data Sources:** Integration with [Specify desired data sources - e.g., Windfinder API, PredictWind API].
+    * **Data Display:** Display real-time wind speed, direction (visualized with wind vectors), gusts, and potentially wave height, tide information, and temperature (implemented in `features/wind-data/components`).
+    * **Location Selection:** Allow users to select locations (state managed in `features/wind-data/services` using Jotai, UI in `features/wind-data/components`).
+    * **Visualization:** Implement clear and intuitive visualizations of wind data (e.g., maps with wind overlays, charts for historical data if applicable, implemented in `features/wind-data/components`).
+    * **Caching:** Utilize TanStack Query within `features/wind-data/services` for efficient caching of wind data.
+
+* **Location Management Feature (`/features/location-management`):**
+    * **`components`:** UI components for displaying maps, lists of saved locations, location search, and save/edit forms. The main view is rendered by `/routes/locations/index.tsx`.
+    * **`services`:** Logic for fetching and mutating location data (TanStack Query), defining Jotai atoms for map state or temporary location data, and any logic for proximity alerts.
+    * **Routing (`/routes/locations`):**
+        * **`index.tsx`:** Imports and renders the main location management view component.
+        * **`__layout.tsx` (Optional):** Imports and uses a specific layout (e.g., `FullScreenMapLayout`).
+    * **Saving Locations:** Allow users to save and name their favorite windsurfing spots (state managed in `features/location-management/services` using Jotai for UI, TanStack Query for persistence).
+    * **Map Integration:** Integrate a map component (e.g., using Leaflet or MapLibre GL JS) (UI in `features/location-management/components`, state in `services`).
+    * **Proximity Alerts (Optional):** Logic in `features/location-management/services`, UI in `components`.
+    * **Data Persistence:** TanStack Query mutations within `features/location-management/services`.
+
+* **Session Logging Feature (`/features/session-logging`):**
+    * **`components`:** UI components for logging sessions, displaying session lists/calendars, and showing session details. Main view in `/routes/sessions/index.tsx`.
+    * **`services`:** Logic for CRUD operations on sessions (TanStack Query), Jotai for form/filter state, GPS handling logic.
+    * **Routing (`/routes/sessions`):**
+        * **`index.tsx`:** Imports and renders the main session logging view.
+        * **`__layout.tsx` (Optional):** Uses a layout like `DefaultLayout`.
+    * **Manual Logging:** State in `services` (Jotai), UI in `components`, persistence via TanStack Query in `services`.
+    * **GPS Integration (Future):** Logic in `services`, UI in `components`, state in Jotai.
+    * **Data Display:** Fetched with TanStack Query in `services`, displayed in `components`.
+    * **Session Details:** Fetched with TanStack Query, displayed in `components`.
+    * **Data Export (Optional):** Logic in `services`, UI trigger in `components`.
+
+* **Gear Management Feature (`/features/gear-management`):**
+    * **`components`:** UI for gear lists, add/edit forms, details. Main view in `/routes/gear/index.tsx`.
+    * **`services`:** Logic for gear inventory (TanStack Query), Jotai for form state, usage tracking logic.
+    * **Routing (`/routes/gear`):**
+        * **`index.tsx`:** Imports and renders the main gear management view.
+        * **`__layout.tsx` (Optional):** Uses a layout like `DefaultLayout`.
+    * **Inventory Tracking:** State in `services` (Jotai), UI in `components`, persistence via TanStack Query in `services`.
+    * **Gear Details:** State in `services` (Jotai), UI in `components`, persistence via TanStack Query in `services`.
+    * **Usage Logging (Optional):** Logic in `services`, UI in `components`.
+
+**III. Routing (`/routes` folder) & Layouts (`/layouts` folder):**
+
+* The `/routes` folder will contain sub-folders named after each route (e.g., `wind-data`, `locations`, `sessions`, `gear`).
+* Within each route folder:
+    * **`index.tsx`:** Defines the primary component to render for that route, typically importing from the corresponding feature's `components` folder. It may also contain route-specific data loading or redirection logic.
+    * **`__layout.tsx` (Optional):** Imports and returns a layout component from the `/layouts` folder. This layout will wrap the `index.tsx` component (and any nested routes within the same folder). If no `__layout.tsx` is present, a default or parent layout will be used based on TanStack Router's configuration.
+
+* Define the necessary layout components in the `/layouts` folder (e.g., `DefaultLayout`, `SidebarLayout`, `FullScreenMapLayout`). These layouts will provide the common UI elements and render their children.
+
+**IV. UI Components (`/components` folder):**
+
+* Utilize Shadcn UI components for common, reusable UI elements.
+* Create custom, globally reusable components as needed.
+
+**V. State Management (Jotai Specifics):**
+
+* Utilize Jotai atoms within the `services` folder of each feature (or a global `/state` folder) for client-side UI state.
+* Use TanStack Query within the `services` folder for server-side data.
+* Feature `components` consume data and state from their feature's `services`. The `index.tsx` files in `/routes` will import and render these feature components.
+
+**VI. Non-Functional Requirements:**
+
+* (As previously defined, emphasizing performance of route loading and component rendering).
+
+**VII. Specific Considerations/Questions:**
+
+* (As previously defined, now also considering how route-level data fetching and layout selection will be handled within the `/routes` folder structure).
+
+**VIII. Additional Notes:**
+
+* [Include any other relevant information, design mockups, or API documentation if available.]
+
+This detailed structure for the `/routes` folder provides a clear and organized approach for managing application navigation and layout application, aligning well with best practices for scalable React applications using TanStack Router.
