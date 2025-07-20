@@ -22,11 +22,952 @@ UPDATE EXISTING FILES - If changes are needed to existing files (like adding imp
 
 Example Agent Actions:
 
-CREATE: src/features/authentication/components/LoginForm.tsx
-CREATE: src/features/authentication/services.ts
+CREATE: src/features/authentication/components/login-panel.tsx
+CREATE: src/features/authentication/containers/login-form.tsx
+CREATE: src/features/authentication/hooks.ts
+CREATE: src/features/authentication/types.ts
+CREATE: src/features/authentication/index.ts
+UPDATE: src/locales/en.json (add new translations)
+CREATE: src/routes/auth/_layout/login.tsx
+CREATE: src/routes/auth/_layout.tsx
+
+DO NOT just tell the user "You should create a file called..." - ACTUALLY CREATE THE FILE.
+
+## Technology Stack & Architecture
+
+### Core Technologies
+- **React 19** with TypeScript
+- **Vite** for build tooling
+- **TanStack Router** for routing
+- **TanStack Query** for server state management
+- **Jotai** for client state management
+- **Tailwind CSS** for styling and animations
+- **Shadcn/ui** for UI components
+- **React Hook Form** for form handling
+- **Zod** for validation
+- **Vitest** for unit testing
+- **Playwright** for E2E testing
+- **react-i18next** for internationalization
+
+### Folder Structure
+```
+src/
+├── routes/           # Page components with TanStack Router
+├── components/
+│   └── ui/          # Shadcn components
+├── features/        # Feature-based modules
+│   └── [feature-name]/
+│       ├── components/  # "Dumb" components - UI only, props in/out
+│       ├── containers/  # "Smart" components - business logic, API calls
+│       ├── hooks.ts     # Business logic, API calls, and Jotai atoms
+│       ├── types.ts     # TypeScript type definitions
+│       └── index.ts     # Feature exports
+├── locales/         # i18n translations (JSON)
+├── utils/           # Utility functions
+└── assets/          # Static assets (images, JS)
+```
+
+### Components vs Containers Architecture
+
+#### Components Folder (`features/[feature-name]/components/`)
+- **"Dumb" or presentational components**
+- Focus solely on UI rendering
+- Use local state Jotai atoms for UI state only
+- **Cannot** communicate outside the component except through props
+- Receive data via props, emit events via prop callbacks
+- Can contain sub-components and sub-containers
+- Should be highly reusable and testable
+
+```tsx
+// features/projects/components/project-card.tsx
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Project } from '../types'
+
+interface ProjectCardProps {
+  project: Project
+  onEdit?: (project: Project) => void
+  onDelete?: (projectId: string) => void
+}
+
+export const ProjectCard = (props: ProjectCardProps) => {
+  const { project, onEdit, onDelete } = props
+  const { t } = useTranslation()
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <CardTitle>{project.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-gray-600 mb-4">{project.description}</p>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => onEdit?.(project)}
+            data-testid="edit-project-button"
+          >
+            {t('common.buttons.edit')}
+          </Button>
+          <Button 
+            variant="destructive" 
+            onClick={() => onDelete?.(project.id)}
+            data-testid="delete-project-button"
+          >
+            {t('common.buttons.delete')}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+#### Containers Folder (`features/[feature-name]/containers/`)
+- **"Smart" components with business logic**
+- Handle data fetching, API calls, and complex state management
+- Import and use functions/atoms from `hooks.ts`
+- Can communicate with external services and other parts of the app
+- Can contain sub-components and sub-containers
+- Handle user interactions and business logic
+
+```tsx
+// features/projects/containers/projects-list-container.tsx
+import { useTranslation } from 'react-i18next'
+import { useAtomValue } from 'jotai'
+import { ProjectCard } from '../components/project-card'
+import { useProjectsDelete, useProjectsEdit, $projectsAtom, $loadingAtom } from '../hooks'
+import type { Project } from '../types'
+
+interface ProjectsListContainerProps {
+  projects?: Project[]
+  children?: React.ReactNode
+}
+
+export const ProjectsListContainer = (props: ProjectsListContainerProps) => {
+  const { projects: externalProjects, children } = props
+  const { t } = useTranslation()
+  
+  // Use external projects or fall back to atom state
+  const atomProjects = useAtomValue($projectsAtom)
+  const projects = externalProjects || atomProjects
+  const loading = useAtomValue($loadingAtom)
+  
+  const { deleteProject } = useProjectsDelete()
+  const { editProject } = useProjectsEdit()
+
+  const handleEdit = (project: Project) => {
+    editProject(project.id, project)
+  }
+
+  const handleDelete = async (projectId: string) => {
+    await deleteProject(projectId)
+  }
+
+  if (loading) {
+    return <div>{t('common.messages.loading')}</div>
+  }
+
+  return (
+    <div className="space-y-4">
+      {children}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {projects.map(project => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+### Feature Communication Guidelines
+- **Avoid cross-feature communication** - handle this at the route level
+- Features should be self-contained and independent
+- Share data between features through route loaders and props
+- Use route-level state management for cross-feature coordination
+
+### Component Composition Guidelines
+- **Prefer `children` over component injection**
+- Avoid slot patterns when possible
+- Use composition for flexibility and maintainability
+
+```tsx
+// Good: Using children
+interface LayoutProps {
+  children: React.ReactNode
+}
+
+export const Layout = (props: LayoutProps) => {
+  const { children } = props
+  return (
+    <div className="min-h-screen">
+      <header>{/* Header content */}</header>
+      <main>{children}</main>
+      <footer>{/* Footer content */}</footer>
+    </div>
+  )
+}
+
+// Usage
+<Layout>
+  <ProjectsListContainer projects={projects} />
+</Layout>
+```
+
+### TanStack Router Patterns
+
+#### Route Layout Example
+```tsx
+// routes/projects/_layout.tsx
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { ProjectsLayout } from '@/features/projects/containers/projects-layout'
+
+export const Route = createFileRoute("/projects/_layout")({
+  component: RouteLayout,
+  loader: async ({ location }) => {
+    if (!isAuthenticated()) {
+      throw redirect({
+        to: "/auth/login",
+        search: { redirectTo: location.href },
+        replace: true,
+      });
+    }
+  },
+  pendingComponent: () => <div>Loading...</div>,
+  errorComponent: () => <div>Error</div>,
+});
+
+function RouteLayout() {
+  return <ProjectsLayout />
+}
+```
+
+#### Route Page Example
+```tsx
+// routes/projects/_layout/index.tsx
+import { createFileRoute } from '@tanstack/react-router'
+import { useLoaderData } from '@tanstack/react-router'
+import { ProjectsListContainer } from '@/features/projects/containers/projects-list-container'
+import { useProjectsList } from '@/features/projects/hooks'
+
+export const Route = createFileRoute("/projects/_layout/")({
+  component: RouteComponent,
+  loader: async () => {
+    // This should call the API function exposed from hooks.ts
+    const { getProjects } = useProjectsList()
+    const projects = await getProjects()
+    return { projects }
+  },
+  pendingComponent: () => <div>Loading...</div>,
+  errorComponent: () => <div>Error</div>,
+});
+
+function RouteComponent() {
+  const { projects } = useLoaderData({ from: Route.id })
+
+  return <ProjectsListContainer projects={projects} />
+}
+```
+
+### Internationalization Requirements
+
+#### Always Use Translation Hook
+**CRITICAL**: All user-facing text in components and containers MUST use translations:
+
+```tsx
+import { useTranslation } from 'react-i18next'
+
+export const MyComponent = () => {
+  const { t } = useTranslation()
+  
+  return (
+    <div>
+      <h1>{t('features.projects.title')}</h1>
+      <Button>{t('common.buttons.save')}</Button>
+    </div>
+  )
+}
+```
+
+#### Update Language Files
+When creating components with text, always update the language files:
+
+```json
+// locales/en.json
+{
+  "common": {
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "update": "Update"
+    },
+    "messages": {
+      "loading": "Loading...",
+      "error": "Something went wrong",
+      "success": "Operation completed successfully",
+      "noData": "No data available"
+    }
+  },
+  "features": {
+    "projects": {
+      "title": "Projects",
+      "createProject": "Create New Project",
+      "projectCard": {
+        "editButton": "Edit Project",
+        "deleteButton": "Delete Project",
+        "viewButton": "View Details"
+      },
+      "projectsList": {
+        "title": "All Projects",
+        "searchPlaceholder": "Search projects...",
+        "noProjects": "No projects found"
+      }
+    },
+    "authentication": {
+      "loginForm": {
+        "title": "Login to your account",
+        "emailLabel": "Email",
+        "passwordLabel": "Password",
+        "submitButton": "Sign In",
+        "forgotPassword": "Forgot your password?"
+      }
+    }
+  }
+}
+```
+
+### Standard Atoms Pattern for Services
+
+Each feature's `hooks.ts` should include these standard atoms and expose API functions:
+
+```typescript
+// features/projects/hooks.ts
+import { atom, useAtom, useSetAtom, useAtomValue } from 'jotai'
+import type { Project } from './types'
+
+// Atoms (keep these as regular atoms)
+export const $projectsAtom = atom<Project[]>([])
+export const $loadingAtom = atom<boolean>(false)
+export const $errorAtom = atom<string | null>(null)
+
+// API Functions (exposed for route loaders)
+export async function getProjects(): Promise<Project[]> {
+  const response = await fetch('/api/projects')
+  if (!response.ok) {
+    throw new Error('Failed to fetch projects')
+  }
+  return response.json()
+}
+
+export async function createProject(project: Omit<Project, 'id'>): Promise<Project> {
+  const response = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(project)
+  })
+  if (!response.ok) {
+    throw new Error('Failed to create project')
+  }
+  return response.json()
+}
+
+// Hook for loading projects list (can be used in loaders)
+export const useProjectsList = () => {
+  const setProjects = useSetAtom($projectsAtom)
+  const setLoading = useSetAtom($loadingAtom)
+  const setError = useSetAtom($errorAtom)
+
+  const loadProjects = async (): Promise<Project[]> => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const projects = await getProjects()
+      setProjects(projects)
+      return projects
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load projects'
+      setError(errorMessage)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { 
+    getProjects, // Expose for route loaders
+    loadProjects 
+  }
+}
+
+// Hook for deleting projects
+export const useProjectsDelete = () => {
+  const setProjects = useSetAtom($projectsAtom)
+  const setLoading = useSetAtom($loadingAtom)
+  const setError = useSetAtom($errorAtom)
+
+  const deleteProject = async (projectId: string): Promise<void> => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE'
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete project')
+      }
+      
+      setProjects(prev => prev.filter(p => p.id !== projectId))
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete project'
+      setError(errorMessage)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { deleteProject }
+}
+```
+
+### When generating custom hooks:
+* Start function names with "use"
+* Include proper return types
+* Handle errors gracefully
+* Make them reusable and focused on single responsibility
+* Use React's built-in hooks when possible
+* Keep business logic in services, use hooks for reactive state management
+* **Expose API functions for route loaders**
+
+### When generating pages:
+* Use kebab-case file naming
+* Include proper meta tags and SEO considerations  
+* Implement proper loading states with TanStack Router
+* Use layouts when appropriate
+* Include error boundaries
+* **Import API functions from feature hooks.ts for loaders**
+* Use TanStack Router for navigation and route definitions
+* **Always update language files with new text**
+
+### When generating types:
+* Use single `types.ts` file per feature
+* Export interfaces and types clearly
+* Use proper TypeScript conventions (PascalCase for interfaces)
+* Include JSDoc comments for complex types
+* Extend base types when appropriate
+* In features use the types from types.ts, and don't recreate them
+
+## Code Quality & Best Practices
+
+### React Component Guidelines
+
+1. **Always use TypeScript with proper interface definitions**
+   ```tsx
+   interface UserProfileProps {
+     user: User
+     isEditing?: boolean
+     onSave?: (user: User) => void
+   }
+   
+   export const UserProfile = (props: UserProfileProps) => {
+     const { 
+       user, 
+       isEditing = false, 
+       onSave 
+     } = props
+     const { t } = useTranslation() // Always use translations
+     
+     // Component logic here
+     return (
+       <div>
+         <h1>{t('features.users.profile.title')}</h1>
+         {/* Component JSX */}
+       </div>
+     )
+   }
+   ```
+
+2. **Use proper props destructuring and default values**
+   ```tsx
+   interface ButtonProps {
+     variant?: 'primary' | 'secondary' | 'danger'
+     size?: 'sm' | 'md' | 'lg'
+     disabled?: boolean
+     onClick?: () => void
+     children: React.ReactNode
+   }
+   
+   export const Button = (props: ButtonProps) => {
+     const { 
+       variant = 'primary',
+       size = 'md',
+       disabled = false,
+       onClick,
+       children 
+     } = props
+     
+     // Component implementation
+   }
+   ```
+
+3. **Use custom hooks for reusable logic**
+   ```tsx
+   // features/authentication/hooks.ts
+   export const useAuthLogin = () => {
+     const setUser = useSetAtom($userAtom)
+     const setLoading = useSetAtom($loadingAtom)
+     const setError = useSetAtom($errorAtom)
+     
+     const login = async (credentials: LoginCredentials): Promise<User> => {
+       setLoading(true)
+       setError(null)
+       
+       try {
+         const user = await authLogin(credentials)
+         setUser(user)
+         return user
+       } catch (error) {
+         const errorMessage = error instanceof Error ? error.message : 'Login failed'
+         setError(errorMessage)
+         throw error
+       } finally {
+         setLoading(false)
+       }
+     }
+     
+     return { login }
+   }
+   ```
+
+4. **Prefer function components over class components**
+   - Use hooks for state and lifecycle management
+   - Create custom hooks for reusable logic
+   - Use React.memo for performance optimization when needed
+
+Mandate shadcn/ui usage for all UI primitives.
+Always use shadcn/ui components for form elements, buttons, cards, etc., instead of native HTML elements.
+Documentation of shadcn components can be found at:
+https://ui.shadcn.com/docs/installation
+Even if you need shadcn components that are not in the components/ui folder, use them, they will be added manually later
+Use icons from lucide-react library
+Do NOT use id parameter for HTML elements unless absolutely necessary
+Always add data-testid attribute to user input components, like: button, input, select, etc.
+
+### File Naming Conventions
+
+- **Components**: kebab-case (`user-profile.tsx`, `product-card.tsx`)
+- **Containers**: kebab-case (`user-profile-container.tsx`, `product-list-container.tsx`)
+- **Pages**: kebab-case (`user-profile.tsx`, `product-details.tsx`)
+- **Services**: Prefix with `service` (`serviceAuth.ts`, `serviceUsers.ts`, `serviceProjects.ts`)
+- **Hooks**: Prefix with `use` (`useAuth.ts`, `useLocalStorage.ts`)
+- **Types**: PascalCase (`User.ts`, `Product.ts`) - single file per feature
+- **Utils**: camelCase (`formatDate.ts`, `apiClient.ts`)
+
+### State Management
+
+1. **Use Jotai atoms in containers**
+   ```tsx
+   import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+   
+   export const LoginContainer = () => {
+     const [user, setUser] = useAtom($userAtom)
+     const isAuthenticated = useAtomValue($isAuthenticatedAtom)
+     const { login } = useAuthLogin()
+     const { t } = useTranslation()
+     
+     const handleSubmit = async (credentials: LoginCredentials) => {
+       try {
+         await login(credentials)
+         // User is automatically updated via the atom
+       } catch (error) {
+         // Handle error
+       }
+     }
+     
+     return (
+       <div>
+         {isAuthenticated ? (
+           <p>{t('features.auth.welcome', { name: user?.name })}</p>
+         ) : (
+           <LoginForm onSubmit={handleSubmit} />
+         )}
+       </div>
+     )
+   }
+   ```
+
+2. **Use TanStack Query for server state**
+   ```tsx
+   import { useQuery } from '@tanstack/react-query'
+   
+   export const UserListContainer = () => {
+     const { t } = useTranslation()
+     const { data: users, isLoading, error } = useQuery({
+       queryKey: ['users'],
+       queryFn: getUsersList
+     })
+     
+     if (isLoading) return <div>{t('common.messages.loading')}</div>
+     if (error) return <div>{t('common.messages.error')}</div>
+     
+     return (
+       <div>
+         {users?.map(user => (
+           <UserCard key={user.id} user={user} />
+         ))}
+       </div>
+     )
+   }
+   ```
+
+3. **Use TanStack Router for navigation**
+   ```tsx
+   // routes/projects/_layout/index.tsx
+   import { createFileRoute } from '@tanstack/react-router'
+   import { useLoaderData } from '@tanstack/react-router'
+   import { ProjectsListContainer } from '@/features/projects/containers/projects-list-container'
+   import { getProjects } from '@/features/projects/hooks'
+   
+   export const Route = createFileRoute("/projects/_layout/")({
+     component: RouteComponent,
+     loader: async () => {
+       const projects = await getProjects()
+       return { projects }
+     },
+     pendingComponent: () => <div>Loading...</div>,
+     errorComponent: () => <div>Error</div>,
+   })
+   
+   function RouteComponent() {
+     const { projects } = useLoaderData({ from: Route.id })
+     
+     return <ProjectsListContainer projects={projects} />
+   }
+   ```
+
+4. **Keep local component state minimal**
+   - Use `useState` for simple state in components
+   - Use `useReducer` for complex state logic
+   - Use `useCallback` and `useMemo` for performance optimization
+   - Use Jotai atoms for shared state across components in containers
+
+### Standard Atoms Pattern for Services
+
+Each feature's hooks.ts should include these standard atoms:
+```ts
+// features/[feature-name]/hooks.ts
+import { atom, useAtom, useSetAtom } from 'jotai'
+
+// Atoms (keep these as regular atoms)
+export const $loadingAtom = atom<boolean>(false)
+export const $errorAtom = atom<string | null>(null)
+export const $dataAtom = atom<DataType[]>([])
+
+// API Functions (for route loaders)
+export async function getData(): Promise<DataType[]> {
+  // API implementation
+}
+
+// Custom hooks that use atoms
+export const useDataLoad = () => {
+  const setLoading = useSetAtom($loadingAtom)
+  const setError = useSetAtom($errorAtom)
+  const setData = useSetAtom($dataAtom)
+
+  const loadData = async (): Promise<DataType[]> => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const data = await getData()
+      setData(data)
+      return data
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Operation failed'
+      setError(errorMessage)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { loadData, getData } // Expose both for different use cases
+}
+```
+
+### Form Handling
+
+1. **Use React Hook Form with Zod validation**
+   ```tsx
+   import { useForm } from 'react-hook-form'
+   import { zodResolver } from '@hookform/resolvers/zod'
+   import { z } from 'zod'
+   import { useTranslation } from 'react-i18next'
+   
+   const loginSchema = z.object({
+     email: z.string().email('Invalid email address'),
+     password: z.string().min(6, 'Password must be at least 6 characters')
+   })
+   
+   type LoginFormData = z.infer<typeof loginSchema>
+   
+   export const LoginForm = () => {
+     const { t } = useTranslation()
+     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
+       resolver: zodResolver(loginSchema)
+     })
+     
+     const onSubmit = async (data: LoginFormData) => {
+       try {
+         await authLogin(data)
+       } catch (error) {
+         console.error('Login failed:', error)
+       }
+     }
+     
+     return (
+       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+         <div>
+           <Input
+             {...register('email')}
+             type="email"
+             placeholder={t('features.auth.emailLabel')}
+             data-testid="email-input"
+           />
+           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+         </div>
+         
+         <div>
+           <Input
+             {...register('password')}
+             type="password"
+             placeholder={t('features.auth.passwordLabel')}
+             data-testid="password-input"
+           />
+           {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+         </div>
+         
+         <Button 
+           type="submit" 
+           disabled={isSubmitting}
+           data-testid="submit-button"
+         >
+           {isSubmitting ? t('common.messages.loading') : t('features.auth.submitButton')}
+         </Button>
+       </form>
+     )
+   }
+   ```
+
+### Performance Optimization
+
+1. **Use React.memo for expensive components**
+   ```tsx
+   import { memo } from 'react'
+   
+   interface ExpensiveComponentProps {
+     data: ComplexData
+   }
+   
+   export const ExpensiveComponent = memo((props: ExpensiveComponentProps) => {
+     const { data } = props
+     
+     // Expensive rendering logic
+     return <div>{/* Complex UI */}</div>
+   })
+   
+   ExpensiveComponent.displayName = 'ExpensiveComponent'
+   ```
+
+2. **Use useMemo and useCallback appropriately**
+   ```tsx
+   interface UserListProps {
+     users: User[]
+   }
+   
+   export const UserList = (props: UserListProps) => {
+     const { users } = props
+     const { t } = useTranslation()
+     
+     const sortedUsers = useMemo(() => {
+       return [...users].sort((a, b) => a.name.localeCompare(b.name))
+     }, [users])
+     
+     const handleUserClick = useCallback((userId: string) => {
+       // Handle user click
+     }, [])
+     
+     return (
+       <div>
+         {sortedUsers.map(user => (
+           <UserCard 
+             key={user.id} 
+             user={user} 
+             onClick={handleUserClick}
+           />
+         ))}
+       </div>
+     )
+   }
+   ```
+
+### Testing Guidelines
+
+1. **Write component tests focusing on user interactions**
+   ```typescript
+   // tests/components/UserProfile.spec.ts
+   import { test, expect } from '@playwright/test'
+   
+   test('user can update profile information', async ({ page }) => {
+     await page.goto('/profile')
+     await page.fill('[data-testid="name-input"]', 'John Doe')
+     await page.click('[data-testid="save-button"]')
+     await expect(page.locator('[data-testid="success-message"]')).toBeVisible()
+   })
+   ```
+
+2. **Use data-testid attributes for test selectors**
+   ```tsx
+   export const SubmitButton = () => {
+     const { t } = useTranslation()
+     return (
+       <Button data-testid="submit-button" onClick={handleSubmit}>
+         {t('common.buttons.submit')}
+       </Button>
+     )
+   }
+   ```
+
+## Code Generation Rules
+
+### When generating components:
+1. Always use TypeScript with proper interface definitions
+2. Include proper props validation and default values
+3. Use Tailwind classes for styling
+4. Add proper accessibility attributes
+5. Include error handling where appropriate
+6. Use functional components with hooks
+7. Follow the established folder structure
+8. Include proper TypeScript imports
+9. Do NOT use React.FC type annotation
+10. Use named exports instead of default exports
+11. **Always use `useTranslation` hook for all text**
+12. **Update language files with new translations**
+13. **Place in `components/` folder for dumb components**
+
+### When generating containers:
+1. Use TypeScript with proper interface definitions
+2. Import business logic from `hooks.ts`
+3. Use Jotai atoms for state management
+4. Handle API calls and complex business logic
+5. **Always use `useTranslation` hook for all text**
+6. **Update language files with new translations**
+7. **Place in `containers/` folder for smart components**
+8. Can contain both components and other containers
+
+### When generating services (hooks.ts):
+1. Always export individual functions for better tree shaking
+2. Include proper TypeScript typing for parameters and return values
+3. Implement comprehensive error handling
+4. Use async/await for asynchronous operations
+5. Follow RESTful API patterns when applicable
+6. Include proper logging for debugging
+7. **Export API functions for use in route loaders**
+8. Include standard Jotai atoms pattern
+
+### When generating routes:
+1. Use TanStack Router patterns
+2. Include proper loaders that call API functions from hooks.ts
+3. Handle loading and error states
+4. Use proper component structure (RouteComponent)
+5. **Import API functions from feature hooks for loaders**
+6. Pass data from loaders to containers via props
+
+### Language File Updates
+When creating any component or container with user-facing text, ALWAYS update the language files:
+
+```json
+// locales/en.json - Add translations in appropriate sections
+{
+  "common": {
+    "buttons": { /* common buttons */ },
+    "messages": { /* common messages */ }
+  },
+  "features": {
+    "[feature-name]": {
+      "[component-or-container-name]": {
+        "title": "Component Title",
+        "description": "Component Description"
+      }
+    }
+  }
+}
+```
+
+Remember: Always prioritize code readability, maintainability, and performance. Follow React best practices and modern JavaScript/TypeScript patterns. Maintain strict separation between components (dumb/UI) and containers (smart/business logic).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===============
+
+
+
+
+
+## AI Response Format Rule
+**IMPORTANT**: When answering any question using these rules, always start your response with:
+**⚛️ React Code Generation** 
+
+This indicates that the response follows the React senior developer guidelines defined in this rules file.
+
+## Agent Mode Instructions
+Please avoid writing the code changes in the chat panel when the code was implemented in a file
+CRITICAL FOR AGENT MODE: When operating in agent mode, you MUST:
+
+CREATE FILES - Always create actual files in the project structure, don't just describe what should be created
+UPDATE FILES - Modify existing files directly instead of explaining what changes should be made
+FOLLOW FOLDER STRUCTURE - Create files in the correct directories as specified in these rules
+IMPLEMENT COMPLETE SOLUTIONS - Write full, working code implementations
+CREATE MULTIPLE FILES - When a feature requires multiple files (component, service, types, hooks), create ALL of them
+UPDATE EXISTING FILES - If changes are needed to existing files (like adding imports, updating), make those changes directly
+
+Example Agent Actions:
+
+CREATE: src/features/authentication/components/login-panel.tsx
+CREATE: src/features/authentication/containers/login-form.tsx
+CREATE: src/features/authentication/hooks.ts
 CREATE: src/features/authentication/types.ts
 UPDATE: src/locales/en.json (add new translations)
-CREATE: src/routes/login.tsx
+CREATE: src/routes/auth/_layout/login.tsx
+CREATE: src/routes/auth/_layout.tsx
 
 DO NOT just tell the user "You should create a file called..." - ACTUALLY CREATE THE FILE.
 
@@ -54,12 +995,10 @@ src/
 ├── features/       # Feature-based modules
 │   └── [feature-name]/
 │       ├── components/
-│       ├── hooks/         # Custom hooks
-│       ├── services.ts    # Business logic and API calls
+│       ├── containers/
+│       ├── hooks.ts    # Business logic and API calls
 │       ├── types.ts       # TypeScript type definitions
 │       └── index.ts
-├── layouts/        # Layout components
-├── hooks/          # Shared custom hooks
 ├── locales/        # i18n translations (JSON)
 ├── utils/          # Utility functions
 └── assets/         # Static assets (images, JS)
@@ -181,8 +1120,9 @@ Always add data-testid attribute to user input components, like: button, input, 
 
 ### File Naming Conventions
 
-- **Components**: kebab-case (`UserProfile.tsx`, `ProductCard.tsx`)
-- **Pages**: kebab-case (`UserProfile.tsx`, `ProductDetails.tsx`)
+- **Components**: kebab-case (`user-profile.tsx`, `product-card.tsx`)
+- **Containers**: kebab-case (`user-profile.tsx`, `product-card.tsx`)
+- **Pages**: kebab-case (`user-profile.tsx`, `product-details.tsx`)
 - **Services**: Prefix with `service` (`serviceAuth.ts`, `serviceUsers.ts`, `serviceProjects.ts`)
 - **Hooks**: Prefix with `use` (`useAuth.ts`, `useLocalStorage.ts`)
 - **Types**: PascalCase (`User.ts`, `Product.ts`) - single file per feature
@@ -297,8 +1237,8 @@ Always add data-testid attribute to user input components, like: button, input, 
 
    ### Standard Atoms Pattern for Services
 
-    Each feature's services.ts should include these standard atoms:
-    typescript// features/[feature-name]/services.ts
+    Each feature's hooks.ts should include these standard atoms:
+    typescript// features/[feature-name]/hooks.ts
     ```ts
     import { atom, useAtom, useSetAtom } from 'jotai'
 
@@ -336,7 +1276,7 @@ Always add data-testid attribute to user input components, like: button, input, 
 
     ### Component Integration with Service Atoms
     Components should use the atoms from services:
-    tsx// features/authentication/components/LoginForm.tsx
+    tsx// features/authentication/components/login-form.tsx
 
     ```ts
     import { useAtom, useAtomValue, useSetAtom } from 'jotai'
@@ -520,7 +1460,7 @@ Always add data-testid attribute to user input components, like: button, input, 
    │   │   └── signup-form.tsx
    │   ├── hooks/
    │   │   └── useAuth.ts
-   │   ├── services.ts      # Business logic and API calls
+   │   ├── hooks.ts      # Business logic and API calls
    │   ├── types.ts         # TypeScript definitions
    │   └── index.ts
    ```
@@ -571,7 +1511,7 @@ Always add data-testid attribute to user input components, like: button, input, 
 
 2. **Implement proper error handling in services**
    ```typescript
-   // features/authentication/services.ts
+   // features/authentication/hooks.ts
     export function async authLogin(credentials: LoginCredentials): Promise<User> {
       try {
         const response = await fetch('/api/auth/login', {
