@@ -226,7 +226,7 @@ export const Layout = (props: LayoutProps) => {
 #### Route Layout Example
 ```tsx
 // routes/projects/_layout.tsx
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { ProjectsLayout } from '@/features/projects/containers/projects-layout'
 
 export const Route = createFileRoute("/projects/_layout")({
@@ -245,7 +245,11 @@ export const Route = createFileRoute("/projects/_layout")({
 });
 
 function RouteLayout() {
-  return <ProjectsLayout />
+	return (
+		<LayoutBlankNotAuth>
+			<Outlet />
+		</LayoutBlankNotAuth>
+	);
 }
 ```
 
