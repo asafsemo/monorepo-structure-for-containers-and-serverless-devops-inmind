@@ -12,12 +12,34 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as ProjectsLayoutRouteImport } from './routes/projects/_layout'
+import { Route as ProjectLayoutRouteImport } from './routes/project/_layout'
 import { Route as AuthLayoutRouteImport } from './routes/auth/_layout'
+import { Route as ProjectsLayoutIndexRouteImport } from './routes/projects/_layout/index'
+import { Route as AuthLayoutRegisterRouteImport } from './routes/auth/_layout/register'
 import { Route as AuthLayoutLoginRouteImport } from './routes/auth/_layout/login'
+import { Route as ProjectLayoutProjectIdIndexRouteImport } from './routes/project/_layout/$projectId/index'
+import { Route as ProjectLayoutProjectIdSecurityRouteImport } from './routes/project/_layout/$projectId/security'
+import { Route as ProjectLayoutProjectIdMonitoringRouteImport } from './routes/project/_layout/$projectId/monitoring'
+import { Route as ProjectLayoutProjectIdMembersRouteImport } from './routes/project/_layout/$projectId/members'
+import { Route as ProjectLayoutProjectIdDeploymentsRouteImport } from './routes/project/_layout/$projectId/deployments'
+import { Route as ProjectLayoutProjectIdDatabaseRouteImport } from './routes/project/_layout/$projectId/database'
+import { Route as ProjectLayoutProjectIdBranchesRouteImport } from './routes/project/_layout/$projectId/branches'
 
+const ProjectsRouteImport = createFileRoute('/projects')()
+const ProjectRouteImport = createFileRoute('/project')()
 const AuthRouteImport = createFileRoute('/auth')()
 
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectRoute = ProjectRouteImport.update({
+  id: '/project',
+  path: '/project',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -28,63 +50,203 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
+const ProjectsLayoutRoute = ProjectsLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => ProjectsRoute,
+} as any)
+const ProjectLayoutRoute = ProjectLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => ProjectRoute,
 } as any)
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => AuthRoute,
+} as any)
+const ProjectsLayoutIndexRoute = ProjectsLayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectsLayoutRoute,
+} as any)
+const AuthLayoutRegisterRoute = AuthLayoutRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 const AuthLayoutLoginRoute = AuthLayoutLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
+const ProjectLayoutProjectIdIndexRoute =
+  ProjectLayoutProjectIdIndexRouteImport.update({
+    id: '/$projectId/',
+    path: '/$projectId/',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
+const ProjectLayoutProjectIdSecurityRoute =
+  ProjectLayoutProjectIdSecurityRouteImport.update({
+    id: '/$projectId/security',
+    path: '/$projectId/security',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
+const ProjectLayoutProjectIdMonitoringRoute =
+  ProjectLayoutProjectIdMonitoringRouteImport.update({
+    id: '/$projectId/monitoring',
+    path: '/$projectId/monitoring',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
+const ProjectLayoutProjectIdMembersRoute =
+  ProjectLayoutProjectIdMembersRouteImport.update({
+    id: '/$projectId/members',
+    path: '/$projectId/members',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
+const ProjectLayoutProjectIdDeploymentsRoute =
+  ProjectLayoutProjectIdDeploymentsRouteImport.update({
+    id: '/$projectId/deployments',
+    path: '/$projectId/deployments',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
+const ProjectLayoutProjectIdDatabaseRoute =
+  ProjectLayoutProjectIdDatabaseRouteImport.update({
+    id: '/$projectId/database',
+    path: '/$projectId/database',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
+const ProjectLayoutProjectIdBranchesRoute =
+  ProjectLayoutProjectIdBranchesRouteImport.update({
+    id: '/$projectId/branches',
+    path: '/$projectId/branches',
+    getParentRoute: () => ProjectLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthLayoutRouteWithChildren
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/project': typeof ProjectLayoutRouteWithChildren
+  '/projects': typeof ProjectsLayoutRouteWithChildren
   '/auth/login': typeof AuthLayoutLoginRoute
+  '/auth/register': typeof AuthLayoutRegisterRoute
+  '/projects/': typeof ProjectsLayoutIndexRoute
+  '/project/$projectId/branches': typeof ProjectLayoutProjectIdBranchesRoute
+  '/project/$projectId/database': typeof ProjectLayoutProjectIdDatabaseRoute
+  '/project/$projectId/deployments': typeof ProjectLayoutProjectIdDeploymentsRoute
+  '/project/$projectId/members': typeof ProjectLayoutProjectIdMembersRoute
+  '/project/$projectId/monitoring': typeof ProjectLayoutProjectIdMonitoringRoute
+  '/project/$projectId/security': typeof ProjectLayoutProjectIdSecurityRoute
+  '/project/$projectId': typeof ProjectLayoutProjectIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthLayoutRouteWithChildren
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/project': typeof ProjectLayoutRouteWithChildren
+  '/projects': typeof ProjectsLayoutIndexRoute
   '/auth/login': typeof AuthLayoutLoginRoute
+  '/auth/register': typeof AuthLayoutRegisterRoute
+  '/project/$projectId/branches': typeof ProjectLayoutProjectIdBranchesRoute
+  '/project/$projectId/database': typeof ProjectLayoutProjectIdDatabaseRoute
+  '/project/$projectId/deployments': typeof ProjectLayoutProjectIdDeploymentsRoute
+  '/project/$projectId/members': typeof ProjectLayoutProjectIdMembersRoute
+  '/project/$projectId/monitoring': typeof ProjectLayoutProjectIdMonitoringRoute
+  '/project/$projectId/security': typeof ProjectLayoutProjectIdSecurityRoute
+  '/project/$projectId': typeof ProjectLayoutProjectIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/auth/_layout': typeof AuthLayoutRouteWithChildren
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/project': typeof ProjectRouteWithChildren
+  '/project/_layout': typeof ProjectLayoutRouteWithChildren
+  '/projects': typeof ProjectsRouteWithChildren
+  '/projects/_layout': typeof ProjectsLayoutRouteWithChildren
   '/auth/_layout/login': typeof AuthLayoutLoginRoute
+  '/auth/_layout/register': typeof AuthLayoutRegisterRoute
+  '/projects/_layout/': typeof ProjectsLayoutIndexRoute
+  '/project/_layout/$projectId/branches': typeof ProjectLayoutProjectIdBranchesRoute
+  '/project/_layout/$projectId/database': typeof ProjectLayoutProjectIdDatabaseRoute
+  '/project/_layout/$projectId/deployments': typeof ProjectLayoutProjectIdDeploymentsRoute
+  '/project/_layout/$projectId/members': typeof ProjectLayoutProjectIdMembersRoute
+  '/project/_layout/$projectId/monitoring': typeof ProjectLayoutProjectIdMonitoringRoute
+  '/project/_layout/$projectId/security': typeof ProjectLayoutProjectIdSecurityRoute
+  '/project/_layout/$projectId/': typeof ProjectLayoutProjectIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/demo/tanstack-query' | '/auth/login'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/project'
+    | '/projects'
+    | '/auth/login'
+    | '/auth/register'
+    | '/projects/'
+    | '/project/$projectId/branches'
+    | '/project/$projectId/database'
+    | '/project/$projectId/deployments'
+    | '/project/$projectId/members'
+    | '/project/$projectId/monitoring'
+    | '/project/$projectId/security'
+    | '/project/$projectId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/demo/tanstack-query' | '/auth/login'
+  to:
+    | '/'
+    | '/auth'
+    | '/project'
+    | '/projects'
+    | '/auth/login'
+    | '/auth/register'
+    | '/project/$projectId/branches'
+    | '/project/$projectId/database'
+    | '/project/$projectId/deployments'
+    | '/project/$projectId/members'
+    | '/project/$projectId/monitoring'
+    | '/project/$projectId/security'
+    | '/project/$projectId'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/auth/_layout'
-    | '/demo/tanstack-query'
+    | '/project'
+    | '/project/_layout'
+    | '/projects'
+    | '/projects/_layout'
     | '/auth/_layout/login'
+    | '/auth/_layout/register'
+    | '/projects/_layout/'
+    | '/project/_layout/$projectId/branches'
+    | '/project/_layout/$projectId/database'
+    | '/project/_layout/$projectId/deployments'
+    | '/project/_layout/$projectId/members'
+    | '/project/_layout/$projectId/monitoring'
+    | '/project/_layout/$projectId/security'
+    | '/project/_layout/$projectId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  ProjectRoute: typeof ProjectRouteWithChildren
+  ProjectsRoute: typeof ProjectsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/project': {
+      id: '/project'
+      path: '/project'
+      fullPath: '/project'
+      preLoaderRoute: typeof ProjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -99,12 +261,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
+    '/projects/_layout': {
+      id: '/projects/_layout'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsLayoutRouteImport
+      parentRoute: typeof ProjectsRoute
+    }
+    '/project/_layout': {
+      id: '/project/_layout'
+      path: '/project'
+      fullPath: '/project'
+      preLoaderRoute: typeof ProjectLayoutRouteImport
+      parentRoute: typeof ProjectRoute
     }
     '/auth/_layout': {
       id: '/auth/_layout'
@@ -113,6 +282,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/projects/_layout/': {
+      id: '/projects/_layout/'
+      path: '/'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsLayoutIndexRouteImport
+      parentRoute: typeof ProjectsLayoutRoute
+    }
+    '/auth/_layout/register': {
+      id: '/auth/_layout/register'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthLayoutRegisterRouteImport
+      parentRoute: typeof AuthLayoutRoute
+    }
     '/auth/_layout/login': {
       id: '/auth/_layout/login'
       path: '/login'
@@ -120,15 +303,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutLoginRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
+    '/project/_layout/$projectId/': {
+      id: '/project/_layout/$projectId/'
+      path: '/$projectId'
+      fullPath: '/project/$projectId'
+      preLoaderRoute: typeof ProjectLayoutProjectIdIndexRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
+    '/project/_layout/$projectId/security': {
+      id: '/project/_layout/$projectId/security'
+      path: '/$projectId/security'
+      fullPath: '/project/$projectId/security'
+      preLoaderRoute: typeof ProjectLayoutProjectIdSecurityRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
+    '/project/_layout/$projectId/monitoring': {
+      id: '/project/_layout/$projectId/monitoring'
+      path: '/$projectId/monitoring'
+      fullPath: '/project/$projectId/monitoring'
+      preLoaderRoute: typeof ProjectLayoutProjectIdMonitoringRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
+    '/project/_layout/$projectId/members': {
+      id: '/project/_layout/$projectId/members'
+      path: '/$projectId/members'
+      fullPath: '/project/$projectId/members'
+      preLoaderRoute: typeof ProjectLayoutProjectIdMembersRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
+    '/project/_layout/$projectId/deployments': {
+      id: '/project/_layout/$projectId/deployments'
+      path: '/$projectId/deployments'
+      fullPath: '/project/$projectId/deployments'
+      preLoaderRoute: typeof ProjectLayoutProjectIdDeploymentsRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
+    '/project/_layout/$projectId/database': {
+      id: '/project/_layout/$projectId/database'
+      path: '/$projectId/database'
+      fullPath: '/project/$projectId/database'
+      preLoaderRoute: typeof ProjectLayoutProjectIdDatabaseRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
+    '/project/_layout/$projectId/branches': {
+      id: '/project/_layout/$projectId/branches'
+      path: '/$projectId/branches'
+      fullPath: '/project/$projectId/branches'
+      preLoaderRoute: typeof ProjectLayoutProjectIdBranchesRouteImport
+      parentRoute: typeof ProjectLayoutRoute
+    }
   }
 }
 
 interface AuthLayoutRouteChildren {
   AuthLayoutLoginRoute: typeof AuthLayoutLoginRoute
+  AuthLayoutRegisterRoute: typeof AuthLayoutRegisterRoute
 }
 
 const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
   AuthLayoutLoginRoute: AuthLayoutLoginRoute,
+  AuthLayoutRegisterRoute: AuthLayoutRegisterRoute,
 }
 
 const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
@@ -145,10 +379,71 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ProjectLayoutRouteChildren {
+  ProjectLayoutProjectIdBranchesRoute: typeof ProjectLayoutProjectIdBranchesRoute
+  ProjectLayoutProjectIdDatabaseRoute: typeof ProjectLayoutProjectIdDatabaseRoute
+  ProjectLayoutProjectIdDeploymentsRoute: typeof ProjectLayoutProjectIdDeploymentsRoute
+  ProjectLayoutProjectIdMembersRoute: typeof ProjectLayoutProjectIdMembersRoute
+  ProjectLayoutProjectIdMonitoringRoute: typeof ProjectLayoutProjectIdMonitoringRoute
+  ProjectLayoutProjectIdSecurityRoute: typeof ProjectLayoutProjectIdSecurityRoute
+  ProjectLayoutProjectIdIndexRoute: typeof ProjectLayoutProjectIdIndexRoute
+}
+
+const ProjectLayoutRouteChildren: ProjectLayoutRouteChildren = {
+  ProjectLayoutProjectIdBranchesRoute: ProjectLayoutProjectIdBranchesRoute,
+  ProjectLayoutProjectIdDatabaseRoute: ProjectLayoutProjectIdDatabaseRoute,
+  ProjectLayoutProjectIdDeploymentsRoute:
+    ProjectLayoutProjectIdDeploymentsRoute,
+  ProjectLayoutProjectIdMembersRoute: ProjectLayoutProjectIdMembersRoute,
+  ProjectLayoutProjectIdMonitoringRoute: ProjectLayoutProjectIdMonitoringRoute,
+  ProjectLayoutProjectIdSecurityRoute: ProjectLayoutProjectIdSecurityRoute,
+  ProjectLayoutProjectIdIndexRoute: ProjectLayoutProjectIdIndexRoute,
+}
+
+const ProjectLayoutRouteWithChildren = ProjectLayoutRoute._addFileChildren(
+  ProjectLayoutRouteChildren,
+)
+
+interface ProjectRouteChildren {
+  ProjectLayoutRoute: typeof ProjectLayoutRouteWithChildren
+}
+
+const ProjectRouteChildren: ProjectRouteChildren = {
+  ProjectLayoutRoute: ProjectLayoutRouteWithChildren,
+}
+
+const ProjectRouteWithChildren =
+  ProjectRoute._addFileChildren(ProjectRouteChildren)
+
+interface ProjectsLayoutRouteChildren {
+  ProjectsLayoutIndexRoute: typeof ProjectsLayoutIndexRoute
+}
+
+const ProjectsLayoutRouteChildren: ProjectsLayoutRouteChildren = {
+  ProjectsLayoutIndexRoute: ProjectsLayoutIndexRoute,
+}
+
+const ProjectsLayoutRouteWithChildren = ProjectsLayoutRoute._addFileChildren(
+  ProjectsLayoutRouteChildren,
+)
+
+interface ProjectsRouteChildren {
+  ProjectsLayoutRoute: typeof ProjectsLayoutRouteWithChildren
+}
+
+const ProjectsRouteChildren: ProjectsRouteChildren = {
+  ProjectsLayoutRoute: ProjectsLayoutRouteWithChildren,
+}
+
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
+  ProjectsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  ProjectRoute: ProjectRouteWithChildren,
+  ProjectsRoute: ProjectsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

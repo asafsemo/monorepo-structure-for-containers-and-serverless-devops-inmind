@@ -1,21 +1,15 @@
-export interface LoginCredentials {
-  email: string
-  password: string
+export interface EmailLoginCredentials {
+	email: string;
+	password: string;
 }
 
-export interface User {
-  id: string
-  email: string
-  name: string
-  avatar?: string
+export interface LocalUser {
+	authenticated?: boolean;
 }
 
-export interface AuthState {
-  user: User | null
-  loading: boolean
-  error: string | null
+export interface RegisterDetails {
+	name: string;
+	email: string;
+	password: string;
+	confirmPassword: string;
 }
-
-export interface LoginFormProps {
-  redirectTo?: string
-} 

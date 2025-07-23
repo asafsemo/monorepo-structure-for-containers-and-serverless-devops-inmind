@@ -18,8 +18,8 @@
 	},
 	"devDependencies": {
 		"@pkg/dev-config": "*",
-		"@types/aws-lambda": "^8.10.134",
-		"@types/node": "^20.11.20",
+		"@types/aws-lambda": "^8.10.152",
+		"@types/node": "^24.1.0",
 		"@types/source-map-support": "^0.5.10"
 	},
 	"dependencies": {

@@ -11,7 +11,7 @@
 	},
 	"devDependencies": {
 		"@pkg/dev-config": "*",
-		"@types/node": "^20.11.20"
+		"@types/node": "^24.1.0"
 	},
 	"dependencies": {
 		"@pkg/lib-containers": "*"

@@ -1,86 +1,86 @@
-import { atom, getDefaultStore } from 'jotai'
-import { atomWithStorage } from 'jotai/utils'
-import type { LoginCredentials, User } from './types'
+// // src/hooks/useAuthentication.ts
 
-// Base atoms
-export const $userAtom = atomWithStorage<User | null>('auth-user', null)
-export const $loadingAtom = atom<boolean>(false)
-export const $loginAtom = atom<boolean>(false)
-export const $errorAtom = atom<string | null>(null)
+import { atom, useAtom } from "jotai";
+import type { EmailLoginCredentials, RegisterDetails } from "./types.ts";
 
-// Derived atoms
-export const $isAuthenticatedAtom = atom((get: (atom: any) => any) => get($userAtom) !== null)
+export const authUserStorageKey = "auth-user";
 
-// Get the Jotai store instance
-const store = getDefaultStore()
+const $isLoading = atom<boolean>(false);
+const $error = atom<Error | null>(null);
 
-export const authLogin = async (credentials: LoginCredentials): Promise<User> => {
-  // Set loading state
-  store.set($loadingAtom, true)
-  store.set($errorAtom, null)
+export const useAuthentication = () => {
+	const [isLoading, setLoading] = useAtom($isLoading);
+	const [error, setError] = useAtom($error);
 
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    })
-    
-    if (!response.ok) {
-      const error = await response.json()
-      const errorMessage = error.message || `Login failed: ${response.statusText}`
-      store.set($errorAtom, errorMessage)
-      throw new Error(errorMessage)
-    }
-    
-    const userData = await response.json()
-    
-    // Set user data on success
-    store.set($userAtom, userData)
-    store.set($loadingAtom, false)
-    
-    return userData
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
-    store.set($errorAtom, errorMessage)
-    store.set($loadingAtom, false)
-    console.error('Error during login:', error)
-    throw error
-  }
-}
+	const isAuthenticated = () => {
+		return !!localStorage.getItem(authUserStorageKey);
+	};
 
-export const authLogout = async (): Promise<void> => {
-  // Set loading state
-  store.set($loadingAtom, true)
-  store.set($errorAtom, null)
+	const getUser = () => {
+		const storage = localStorage.getItem(authUserStorageKey);
+		if (!storage) return null;
+		return JSON.parse(storage);
+	};
 
-  try {
-    await fetch('/api/auth/logout', { method: 'POST' })
-    
-    // Clear user data on successful logout
-    store.set($userAtom, null)
-    store.set($loadingAtom, false)
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Logout failed'
-    store.set($errorAtom, errorMessage)
-    store.set($loadingAtom, false)
-    console.error('Error during logout:', error)
-    throw error
-  }
-}
+	const apiAction = async (
+		url: string,
+		method: string,
+		body: object,
+		defaultErrorMessage: string,
+	) => {
+		setLoading(true);
+		setError(null);
+		try {
+			const response = await fetch(url, {
+				method,
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(body),
+			});
 
-export const clearAuthError = (): void => {
-  store.set($errorAtom, null)
-}
+			const resBody = await response.json();
 
-export const setAuthLoading = (loading: boolean): void => {
-  store.set($loadingAtom, loading)
-}
+			if (!response.ok) {
+				const errorMessage = resBody.message || defaultErrorMessage;
+				setError(new Error(errorMessage));
+				localStorage.removeItem(authUserStorageKey);
+				return;
+			}
 
-// Service object for consistent API
-export const serviceAuth = {
-  login: authLogin,
-  logout: authLogout,
-  clearError: clearAuthError,
-  setLoading: setAuthLoading
-} 
+			localStorage.setItem(authUserStorageKey, JSON.stringify(resBody.data));
+		} catch (err) {
+			setError(err as Error);
+			localStorage.removeItem(authUserStorageKey);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const loginEmail = async (
+		credentials: EmailLoginCredentials,
+	): Promise<void> => {
+		return apiAction("/api/auth/login", "POST", credentials, "Login failed");
+	};
+
+	const register = async (registerDetails: RegisterDetails): Promise<void> => {
+		return apiAction(
+			"/api/auth/register",
+			"POST",
+			registerDetails,
+			"Register failed",
+		);
+	};
+
+	const logout = async (): Promise<void> => {
+		return apiAction("/api/auth/logout", "POST", {}, "Logout failed");
+	};
+
+	return {
+		loginEmail,
+		register,
+		logout,
+		isAuthenticated,
+		isLoading,
+		error,
+		getUser,
+	};
+};
