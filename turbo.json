@@ -1,27 +1,40 @@
 {
-    "$schema": "https://turbo.build/schema.json",
-    "tasks": {
-        "build": {
-            "dependsOn": [
-                "^build"
-            ],
-            "outputs": [
-                "dist/**"
-            ]
-        },
-        "lint": {
-            "cache": false,
-            "outputs": [
-            ]
-        },
-        "exec-ui": {
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"exec-ui": {
 			"persistent": true,
 			"outputs": [],
 			"dependsOn": ["build-ui"]
 		},
-        "build-ui": {
+		"exec-serverless": {
+			"persistent": true,
+			"outputs": [],
+			"dependsOn": ["build-backend"]
+		},
+		"build-backend": {
+			"dependsOn": ["^build-backend"],
+			"outputs": ["dist/**"]
+		},
+		"build-ui": {
 			"dependsOn": ["^build-ui"],
 			"outputs": ["dist/**"]
+		},
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**"]
+		},
+		"exec-dev": {
+			"persistent": true,
+			"dependsOn": ["build"]
+		},
+		"exec-api": {
+			"dependsOn": ["^exec-api"]
+		},
+		"exec-unit": {
+			"dependsOn": ["^exec-unit"]
+		},
+		"exec-coverage": {
+			"dependsOn": ["^exec-coverage"]
 		}
-    }
+	}
 }

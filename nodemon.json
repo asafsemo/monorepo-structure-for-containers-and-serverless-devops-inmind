@@ -1,7 +1,8 @@
 {
-    "watch": ["./packages", "./packages-tests", "./apps"],
-    "ext": "json, ts, proto",
-    "ignore": ["node_modules", "coverage", "**/dist/*"],
-    "restartable": "rs",
-    "exec": "yarn build && node run-dev.js"
+	"verbose": false,
+	"watch": ["./packages", "./apps"],
+	"ext": "json, ts, proto",
+	"ignore": ["node_modules", "**/dist/*", "**/**/src/*.d.ts", "**/vite.config.mts.*.mjs", "**/*.d.ts"],
+	"restartable": "rs",
+	"exec": "turbo ${EXEC_PARAM} -- --mode mock"
 }

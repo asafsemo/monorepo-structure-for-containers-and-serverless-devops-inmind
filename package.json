@@ -10,13 +10,20 @@
         "packages/**"
     ],
     "scripts": {
-        "build": "turbo build --no-daemon",
-        "dev": "nodemon",
-        "serverless": "NODEMON_SCRIPT=exec-serverless nodemon",
-        "clean": "node clean.js",
-        "lint": "turbo lint --no-daemon",
-        "g:tsc": "cd $INIT_CWD && tsc-absolute",
-        "root-ui": "turbo exec-ui --no-daemon"
+		"build": "turbo build --force",
+		"build-backend": "turbo build-backend --force",
+		"root-dev": "yarn install && EXEC_PARAM=exec-dev nodemon",
+		"root-serverless": "yarn install && EXEC_PARAM=exec-serverless nodemon",
+		"root-ui": "yarn install && EXEC_PARAM=exec-ui nodemon",
+		"root-coverage": "yarn install && turbo exec-coverage",
+		"root-api": "yarn install && turbo exec-api",
+		"root-unit": "yarn install && yarn build-backend && turbo exec-unit",
+		"clean": "node clean.js",
+		"g:tsc": "cd $INIT_CWD && tsc-absolute",
+		"g:jasmine": "cd $INIT_CWD && jasmine",
+		"mobile-dev": "./mobile-apps/build-mobile-dev.sh",
+		"mobile-prod": "./mobile-apps/build-mobile-prod.sh",
+		"lint": "eslint ."
     },
     "devDependencies": {
         "c8": "^10.1.3",
