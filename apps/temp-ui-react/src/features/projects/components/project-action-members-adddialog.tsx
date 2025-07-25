@@ -12,7 +12,9 @@ import {
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 
-interface ProjectActionMembersAddDialogProps {}
+interface ProjectActionMembersAddDialogProps {
+	className?: string;
+}
 
 export const ProjectActionMembersAddDialog = (
 	_props: ProjectActionMembersAddDialogProps,

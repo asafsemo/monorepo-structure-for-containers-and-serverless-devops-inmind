@@ -1,9 +1,9 @@
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import * as TanStackQueryProvider from "./integrations/tanstack-query/root-provider.tsx";
-import "./integrations/i18n.ts"; // Import i18n config
+import "./features/locales/services"; // Import i18n config
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";

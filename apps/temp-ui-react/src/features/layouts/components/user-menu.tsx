@@ -1,4 +1,5 @@
 import { LogOut, Settings } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,8 @@ interface UserMenuProps {
 }
 
 export const UserMenu = (props: UserMenuProps) => {
+	const { t } = useTranslation();
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -29,7 +32,7 @@ export const UserMenu = (props: UserMenuProps) => {
 				</DropdownMenuItem>
 				<DropdownMenuItem onClick={props.handleLogout}>
 					<LogOut className="mr-2 h-4 w-4" />
-					Log out
+					{t("components.header.userMenu.logout")}
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

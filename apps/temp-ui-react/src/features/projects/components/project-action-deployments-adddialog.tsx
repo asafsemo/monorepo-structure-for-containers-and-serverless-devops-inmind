@@ -13,7 +13,9 @@ import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 
-interface ProjectActionDeploymentsAddDialogProps {}
+interface ProjectActionDeploymentsAddDialogProps {
+	className?: string;
+}
 
 export const ProjectActionDeploymentsAddDialog = (
 	_props: ProjectActionDeploymentsAddDialogProps,
