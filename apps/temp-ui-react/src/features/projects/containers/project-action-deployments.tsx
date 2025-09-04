@@ -1,10 +1,10 @@
-import { Badge } from "@/components/ui/badge.tsx";
+import { Badge } from "@/components/ui/badge";
 import {
 	Card,
 	CardContent,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card.tsx";
+} from "@/components/ui/card";
 import { getStatusColor, getStatusIcon } from "../services";
 
 interface ProjectActionDeploymentsProps {

@@ -15,7 +15,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Project } from "../types.ts";
+import { getTranslation } from "@/integrations/i18n";
+import type { Project } from "../types";
 
 interface ProjectsListProps {
 	projects: Project[];
@@ -31,16 +32,18 @@ const getStatusColor = (status: string) => {
 };
 
 export const ProjectsList = (props: ProjectsListProps) => {
+	const t = getTranslation();
+
 	return (
 		<div className="min-h-screen bg-background">
 			{/* Main Content */}
 			<main className="p-4 md:p-6">
 				<div className="mb-6">
 					<h2 className="text-2xl font-bold tracking-tight mb-2">
-						My Projects
+						{t('features.projects.projectsList.title', 'My Projects')}
 					</h2>
 					<p className="text-muted-foreground">
-						Manage and monitor your active projects
+						{t('features.projects.projectsList.subtitle', 'Manage and monitor your active projects')}
 					</p>
 				</div>
 
@@ -62,9 +65,13 @@ export const ProjectsList = (props: ProjectsListProps) => {
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem asChild>
-											<Link to={`/project/${project.id}`}>View Details</Link>
+											<Link to={`/project/${project.id}`} data-testid="view-project-link">
+												{t('features.projects.projectCard.viewDetails', 'View Details')}
+											</Link>
 										</DropdownMenuItem>
-										<DropdownMenuItem>Edit Project</DropdownMenuItem>
+										<DropdownMenuItem data-testid="edit-project-button">
+											{t('features.projects.projectCard.editProject', 'Edit Project')}
+										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
 							</CardHeader>
@@ -88,16 +95,18 @@ export const ProjectsList = (props: ProjectsListProps) => {
 								<div className="flex items-center justify-between text-sm text-muted-foreground">
 									<div className="flex items-center">
 										<Users className="mr-1 h-3 w-3" />
-										{project.members} members
+										{t('features.projects.projectCard.membersCount', '{count} members', { count: project.members })}
 									</div>
 									<div className="flex items-center">
 										<Activity className="mr-1 h-3 w-3" />
-										{project.deployments} deployments
+										{t('features.projects.projectCard.deploymentsCount', '{count} deployments', { count: project.deployments })}
 									</div>
 								</div>
 
-								<Button asChild className="w-full mt-4" variant="outline">
-									<Link to={`/project/${project.id}`}>Open Project</Link>
+								<Button asChild className="w-full mt-4" variant="outline" data-testid="open-project-button">
+									<Link to={`/project/${project.id}`}>
+										{t('features.projects.projectCard.openProject', 'Open Project')}
+									</Link>
 								</Button>
 							</CardContent>
 						</Card>

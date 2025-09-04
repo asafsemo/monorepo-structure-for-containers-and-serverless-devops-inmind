@@ -13,31 +13,27 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsLayoutRouteImport } from './routes/projects/_layout'
-import { Route as ProjectLayoutRouteImport } from './routes/project/_layout'
 import { Route as AuthLayoutRouteImport } from './routes/auth/_layout'
 import { Route as ProjectsLayoutIndexRouteImport } from './routes/projects/_layout/index'
+import { Route as ProjectProjectIdSidebarRouteImport } from './routes/project/$projectId/_sidebar'
+import { Route as ProjectProjectIdNosidebarRouteImport } from './routes/project/$projectId/_nosidebar'
 import { Route as AuthLayoutRegisterRouteImport } from './routes/auth/_layout/register'
 import { Route as AuthLayoutLoginRouteImport } from './routes/auth/_layout/login'
-import { Route as ProjectLayoutProjectIdIndexRouteImport } from './routes/project/_layout/$projectId/index'
-import { Route as ProjectLayoutProjectIdSecurityRouteImport } from './routes/project/_layout/$projectId/security'
-import { Route as ProjectLayoutProjectIdMonitoringRouteImport } from './routes/project/_layout/$projectId/monitoring'
-import { Route as ProjectLayoutProjectIdMembersRouteImport } from './routes/project/_layout/$projectId/members'
-import { Route as ProjectLayoutProjectIdDeploymentsRouteImport } from './routes/project/_layout/$projectId/deployments'
-import { Route as ProjectLayoutProjectIdDatabaseRouteImport } from './routes/project/_layout/$projectId/database'
-import { Route as ProjectLayoutProjectIdBranchesRouteImport } from './routes/project/_layout/$projectId/branches'
+import { Route as ProjectProjectIdSidebarIndexRouteImport } from './routes/project/$projectId/_sidebar/index'
+import { Route as ProjectProjectIdNosidebarSecurityRouteImport } from './routes/project/$projectId/_nosidebar/security'
+import { Route as ProjectProjectIdNosidebarMonitoringRouteImport } from './routes/project/$projectId/_nosidebar/monitoring'
+import { Route as ProjectProjectIdNosidebarMembersRouteImport } from './routes/project/$projectId/_nosidebar/members'
+import { Route as ProjectProjectIdNosidebarDeploymentsRouteImport } from './routes/project/$projectId/_nosidebar/deployments'
+import { Route as ProjectProjectIdNosidebarDatabaseRouteImport } from './routes/project/$projectId/_nosidebar/database'
+import { Route as ProjectProjectIdNosidebarBranchesRouteImport } from './routes/project/$projectId/_nosidebar/branches'
 
 const ProjectsRouteImport = createFileRoute('/projects')()
-const ProjectRouteImport = createFileRoute('/project')()
 const AuthRouteImport = createFileRoute('/auth')()
+const ProjectProjectIdRouteImport = createFileRoute('/project/$projectId')()
 
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectRoute = ProjectRouteImport.update({
-  id: '/project',
-  path: '/project',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -50,13 +46,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectProjectIdRoute = ProjectProjectIdRouteImport.update({
+  id: '/project/$projectId',
+  path: '/project/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsLayoutRoute = ProjectsLayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => ProjectsRoute,
-} as any)
-const ProjectLayoutRoute = ProjectLayoutRouteImport.update({
-  id: '/_layout',
-  getParentRoute: () => ProjectRoute,
 } as any)
 const AuthLayoutRoute = AuthLayoutRouteImport.update({
   id: '/_layout',
@@ -67,6 +64,15 @@ const ProjectsLayoutIndexRoute = ProjectsLayoutIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectsLayoutRoute,
 } as any)
+const ProjectProjectIdSidebarRoute = ProjectProjectIdSidebarRouteImport.update({
+  id: '/_sidebar',
+  getParentRoute: () => ProjectProjectIdRoute,
+} as any)
+const ProjectProjectIdNosidebarRoute =
+  ProjectProjectIdNosidebarRouteImport.update({
+    id: '/_nosidebar',
+    getParentRoute: () => ProjectProjectIdRoute,
+  } as any)
 const AuthLayoutRegisterRoute = AuthLayoutRegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -77,109 +83,109 @@ const AuthLayoutLoginRoute = AuthLayoutLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthLayoutRoute,
 } as any)
-const ProjectLayoutProjectIdIndexRoute =
-  ProjectLayoutProjectIdIndexRouteImport.update({
-    id: '/$projectId/',
-    path: '/$projectId/',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdSidebarIndexRoute =
+  ProjectProjectIdSidebarIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProjectProjectIdSidebarRoute,
   } as any)
-const ProjectLayoutProjectIdSecurityRoute =
-  ProjectLayoutProjectIdSecurityRouteImport.update({
-    id: '/$projectId/security',
-    path: '/$projectId/security',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdNosidebarSecurityRoute =
+  ProjectProjectIdNosidebarSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => ProjectProjectIdNosidebarRoute,
   } as any)
-const ProjectLayoutProjectIdMonitoringRoute =
-  ProjectLayoutProjectIdMonitoringRouteImport.update({
-    id: '/$projectId/monitoring',
-    path: '/$projectId/monitoring',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdNosidebarMonitoringRoute =
+  ProjectProjectIdNosidebarMonitoringRouteImport.update({
+    id: '/monitoring',
+    path: '/monitoring',
+    getParentRoute: () => ProjectProjectIdNosidebarRoute,
   } as any)
-const ProjectLayoutProjectIdMembersRoute =
-  ProjectLayoutProjectIdMembersRouteImport.update({
-    id: '/$projectId/members',
-    path: '/$projectId/members',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdNosidebarMembersRoute =
+  ProjectProjectIdNosidebarMembersRouteImport.update({
+    id: '/members',
+    path: '/members',
+    getParentRoute: () => ProjectProjectIdNosidebarRoute,
   } as any)
-const ProjectLayoutProjectIdDeploymentsRoute =
-  ProjectLayoutProjectIdDeploymentsRouteImport.update({
-    id: '/$projectId/deployments',
-    path: '/$projectId/deployments',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdNosidebarDeploymentsRoute =
+  ProjectProjectIdNosidebarDeploymentsRouteImport.update({
+    id: '/deployments',
+    path: '/deployments',
+    getParentRoute: () => ProjectProjectIdNosidebarRoute,
   } as any)
-const ProjectLayoutProjectIdDatabaseRoute =
-  ProjectLayoutProjectIdDatabaseRouteImport.update({
-    id: '/$projectId/database',
-    path: '/$projectId/database',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdNosidebarDatabaseRoute =
+  ProjectProjectIdNosidebarDatabaseRouteImport.update({
+    id: '/database',
+    path: '/database',
+    getParentRoute: () => ProjectProjectIdNosidebarRoute,
   } as any)
-const ProjectLayoutProjectIdBranchesRoute =
-  ProjectLayoutProjectIdBranchesRouteImport.update({
-    id: '/$projectId/branches',
-    path: '/$projectId/branches',
-    getParentRoute: () => ProjectLayoutRoute,
+const ProjectProjectIdNosidebarBranchesRoute =
+  ProjectProjectIdNosidebarBranchesRouteImport.update({
+    id: '/branches',
+    path: '/branches',
+    getParentRoute: () => ProjectProjectIdNosidebarRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthLayoutRouteWithChildren
-  '/project': typeof ProjectLayoutRouteWithChildren
   '/projects': typeof ProjectsLayoutRouteWithChildren
   '/auth/login': typeof AuthLayoutLoginRoute
   '/auth/register': typeof AuthLayoutRegisterRoute
+  '/project/$projectId': typeof ProjectProjectIdSidebarRouteWithChildren
   '/projects/': typeof ProjectsLayoutIndexRoute
-  '/project/$projectId/branches': typeof ProjectLayoutProjectIdBranchesRoute
-  '/project/$projectId/database': typeof ProjectLayoutProjectIdDatabaseRoute
-  '/project/$projectId/deployments': typeof ProjectLayoutProjectIdDeploymentsRoute
-  '/project/$projectId/members': typeof ProjectLayoutProjectIdMembersRoute
-  '/project/$projectId/monitoring': typeof ProjectLayoutProjectIdMonitoringRoute
-  '/project/$projectId/security': typeof ProjectLayoutProjectIdSecurityRoute
-  '/project/$projectId': typeof ProjectLayoutProjectIdIndexRoute
+  '/project/$projectId/branches': typeof ProjectProjectIdNosidebarBranchesRoute
+  '/project/$projectId/database': typeof ProjectProjectIdNosidebarDatabaseRoute
+  '/project/$projectId/deployments': typeof ProjectProjectIdNosidebarDeploymentsRoute
+  '/project/$projectId/members': typeof ProjectProjectIdNosidebarMembersRoute
+  '/project/$projectId/monitoring': typeof ProjectProjectIdNosidebarMonitoringRoute
+  '/project/$projectId/security': typeof ProjectProjectIdNosidebarSecurityRoute
+  '/project/$projectId/': typeof ProjectProjectIdSidebarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthLayoutRouteWithChildren
-  '/project': typeof ProjectLayoutRouteWithChildren
   '/projects': typeof ProjectsLayoutIndexRoute
   '/auth/login': typeof AuthLayoutLoginRoute
   '/auth/register': typeof AuthLayoutRegisterRoute
-  '/project/$projectId/branches': typeof ProjectLayoutProjectIdBranchesRoute
-  '/project/$projectId/database': typeof ProjectLayoutProjectIdDatabaseRoute
-  '/project/$projectId/deployments': typeof ProjectLayoutProjectIdDeploymentsRoute
-  '/project/$projectId/members': typeof ProjectLayoutProjectIdMembersRoute
-  '/project/$projectId/monitoring': typeof ProjectLayoutProjectIdMonitoringRoute
-  '/project/$projectId/security': typeof ProjectLayoutProjectIdSecurityRoute
-  '/project/$projectId': typeof ProjectLayoutProjectIdIndexRoute
+  '/project/$projectId': typeof ProjectProjectIdSidebarIndexRoute
+  '/project/$projectId/branches': typeof ProjectProjectIdNosidebarBranchesRoute
+  '/project/$projectId/database': typeof ProjectProjectIdNosidebarDatabaseRoute
+  '/project/$projectId/deployments': typeof ProjectProjectIdNosidebarDeploymentsRoute
+  '/project/$projectId/members': typeof ProjectProjectIdNosidebarMembersRoute
+  '/project/$projectId/monitoring': typeof ProjectProjectIdNosidebarMonitoringRoute
+  '/project/$projectId/security': typeof ProjectProjectIdNosidebarSecurityRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/auth/_layout': typeof AuthLayoutRouteWithChildren
-  '/project': typeof ProjectRouteWithChildren
-  '/project/_layout': typeof ProjectLayoutRouteWithChildren
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/_layout': typeof ProjectsLayoutRouteWithChildren
   '/auth/_layout/login': typeof AuthLayoutLoginRoute
   '/auth/_layout/register': typeof AuthLayoutRegisterRoute
+  '/project/$projectId': typeof ProjectProjectIdRouteWithChildren
+  '/project/$projectId/_nosidebar': typeof ProjectProjectIdNosidebarRouteWithChildren
+  '/project/$projectId/_sidebar': typeof ProjectProjectIdSidebarRouteWithChildren
   '/projects/_layout/': typeof ProjectsLayoutIndexRoute
-  '/project/_layout/$projectId/branches': typeof ProjectLayoutProjectIdBranchesRoute
-  '/project/_layout/$projectId/database': typeof ProjectLayoutProjectIdDatabaseRoute
-  '/project/_layout/$projectId/deployments': typeof ProjectLayoutProjectIdDeploymentsRoute
-  '/project/_layout/$projectId/members': typeof ProjectLayoutProjectIdMembersRoute
-  '/project/_layout/$projectId/monitoring': typeof ProjectLayoutProjectIdMonitoringRoute
-  '/project/_layout/$projectId/security': typeof ProjectLayoutProjectIdSecurityRoute
-  '/project/_layout/$projectId/': typeof ProjectLayoutProjectIdIndexRoute
+  '/project/$projectId/_nosidebar/branches': typeof ProjectProjectIdNosidebarBranchesRoute
+  '/project/$projectId/_nosidebar/database': typeof ProjectProjectIdNosidebarDatabaseRoute
+  '/project/$projectId/_nosidebar/deployments': typeof ProjectProjectIdNosidebarDeploymentsRoute
+  '/project/$projectId/_nosidebar/members': typeof ProjectProjectIdNosidebarMembersRoute
+  '/project/$projectId/_nosidebar/monitoring': typeof ProjectProjectIdNosidebarMonitoringRoute
+  '/project/$projectId/_nosidebar/security': typeof ProjectProjectIdNosidebarSecurityRoute
+  '/project/$projectId/_sidebar/': typeof ProjectProjectIdSidebarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/project'
     | '/projects'
     | '/auth/login'
     | '/auth/register'
+    | '/project/$projectId'
     | '/projects/'
     | '/project/$projectId/branches'
     | '/project/$projectId/database'
@@ -187,48 +193,48 @@ export interface FileRouteTypes {
     | '/project/$projectId/members'
     | '/project/$projectId/monitoring'
     | '/project/$projectId/security'
-    | '/project/$projectId'
+    | '/project/$projectId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/project'
     | '/projects'
     | '/auth/login'
     | '/auth/register'
+    | '/project/$projectId'
     | '/project/$projectId/branches'
     | '/project/$projectId/database'
     | '/project/$projectId/deployments'
     | '/project/$projectId/members'
     | '/project/$projectId/monitoring'
     | '/project/$projectId/security'
-    | '/project/$projectId'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/auth/_layout'
-    | '/project'
-    | '/project/_layout'
     | '/projects'
     | '/projects/_layout'
     | '/auth/_layout/login'
     | '/auth/_layout/register'
+    | '/project/$projectId'
+    | '/project/$projectId/_nosidebar'
+    | '/project/$projectId/_sidebar'
     | '/projects/_layout/'
-    | '/project/_layout/$projectId/branches'
-    | '/project/_layout/$projectId/database'
-    | '/project/_layout/$projectId/deployments'
-    | '/project/_layout/$projectId/members'
-    | '/project/_layout/$projectId/monitoring'
-    | '/project/_layout/$projectId/security'
-    | '/project/_layout/$projectId/'
+    | '/project/$projectId/_nosidebar/branches'
+    | '/project/$projectId/_nosidebar/database'
+    | '/project/$projectId/_nosidebar/deployments'
+    | '/project/$projectId/_nosidebar/members'
+    | '/project/$projectId/_nosidebar/monitoring'
+    | '/project/$projectId/_nosidebar/security'
+    | '/project/$projectId/_sidebar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
-  ProjectRoute: typeof ProjectRouteWithChildren
   ProjectsRoute: typeof ProjectsRouteWithChildren
+  ProjectProjectIdRoute: typeof ProjectProjectIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -238,13 +244,6 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof ProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/project': {
-      id: '/project'
-      path: '/project'
-      fullPath: '/project'
-      preLoaderRoute: typeof ProjectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -261,19 +260,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/project/$projectId': {
+      id: '/project/$projectId'
+      path: '/project/$projectId'
+      fullPath: '/project/$projectId'
+      preLoaderRoute: typeof ProjectProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/_layout': {
       id: '/projects/_layout'
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof ProjectsLayoutRouteImport
       parentRoute: typeof ProjectsRoute
-    }
-    '/project/_layout': {
-      id: '/project/_layout'
-      path: '/project'
-      fullPath: '/project'
-      preLoaderRoute: typeof ProjectLayoutRouteImport
-      parentRoute: typeof ProjectRoute
     }
     '/auth/_layout': {
       id: '/auth/_layout'
@@ -289,6 +288,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsLayoutIndexRouteImport
       parentRoute: typeof ProjectsLayoutRoute
     }
+    '/project/$projectId/_sidebar': {
+      id: '/project/$projectId/_sidebar'
+      path: ''
+      fullPath: '/project/$projectId'
+      preLoaderRoute: typeof ProjectProjectIdSidebarRouteImport
+      parentRoute: typeof ProjectProjectIdRoute
+    }
+    '/project/$projectId/_nosidebar': {
+      id: '/project/$projectId/_nosidebar'
+      path: '/project/$projectId'
+      fullPath: '/project/$projectId'
+      preLoaderRoute: typeof ProjectProjectIdNosidebarRouteImport
+      parentRoute: typeof ProjectProjectIdRoute
+    }
     '/auth/_layout/register': {
       id: '/auth/_layout/register'
       path: '/register'
@@ -303,54 +316,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutLoginRouteImport
       parentRoute: typeof AuthLayoutRoute
     }
-    '/project/_layout/$projectId/': {
-      id: '/project/_layout/$projectId/'
-      path: '/$projectId'
-      fullPath: '/project/$projectId'
-      preLoaderRoute: typeof ProjectLayoutProjectIdIndexRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+    '/project/$projectId/_sidebar/': {
+      id: '/project/$projectId/_sidebar/'
+      path: '/'
+      fullPath: '/project/$projectId/'
+      preLoaderRoute: typeof ProjectProjectIdSidebarIndexRouteImport
+      parentRoute: typeof ProjectProjectIdSidebarRoute
     }
-    '/project/_layout/$projectId/security': {
-      id: '/project/_layout/$projectId/security'
-      path: '/$projectId/security'
+    '/project/$projectId/_nosidebar/security': {
+      id: '/project/$projectId/_nosidebar/security'
+      path: '/security'
       fullPath: '/project/$projectId/security'
-      preLoaderRoute: typeof ProjectLayoutProjectIdSecurityRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+      preLoaderRoute: typeof ProjectProjectIdNosidebarSecurityRouteImport
+      parentRoute: typeof ProjectProjectIdNosidebarRoute
     }
-    '/project/_layout/$projectId/monitoring': {
-      id: '/project/_layout/$projectId/monitoring'
-      path: '/$projectId/monitoring'
+    '/project/$projectId/_nosidebar/monitoring': {
+      id: '/project/$projectId/_nosidebar/monitoring'
+      path: '/monitoring'
       fullPath: '/project/$projectId/monitoring'
-      preLoaderRoute: typeof ProjectLayoutProjectIdMonitoringRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+      preLoaderRoute: typeof ProjectProjectIdNosidebarMonitoringRouteImport
+      parentRoute: typeof ProjectProjectIdNosidebarRoute
     }
-    '/project/_layout/$projectId/members': {
-      id: '/project/_layout/$projectId/members'
-      path: '/$projectId/members'
+    '/project/$projectId/_nosidebar/members': {
+      id: '/project/$projectId/_nosidebar/members'
+      path: '/members'
       fullPath: '/project/$projectId/members'
-      preLoaderRoute: typeof ProjectLayoutProjectIdMembersRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+      preLoaderRoute: typeof ProjectProjectIdNosidebarMembersRouteImport
+      parentRoute: typeof ProjectProjectIdNosidebarRoute
     }
-    '/project/_layout/$projectId/deployments': {
-      id: '/project/_layout/$projectId/deployments'
-      path: '/$projectId/deployments'
+    '/project/$projectId/_nosidebar/deployments': {
+      id: '/project/$projectId/_nosidebar/deployments'
+      path: '/deployments'
       fullPath: '/project/$projectId/deployments'
-      preLoaderRoute: typeof ProjectLayoutProjectIdDeploymentsRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+      preLoaderRoute: typeof ProjectProjectIdNosidebarDeploymentsRouteImport
+      parentRoute: typeof ProjectProjectIdNosidebarRoute
     }
-    '/project/_layout/$projectId/database': {
-      id: '/project/_layout/$projectId/database'
-      path: '/$projectId/database'
+    '/project/$projectId/_nosidebar/database': {
+      id: '/project/$projectId/_nosidebar/database'
+      path: '/database'
       fullPath: '/project/$projectId/database'
-      preLoaderRoute: typeof ProjectLayoutProjectIdDatabaseRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+      preLoaderRoute: typeof ProjectProjectIdNosidebarDatabaseRouteImport
+      parentRoute: typeof ProjectProjectIdNosidebarRoute
     }
-    '/project/_layout/$projectId/branches': {
-      id: '/project/_layout/$projectId/branches'
-      path: '/$projectId/branches'
+    '/project/$projectId/_nosidebar/branches': {
+      id: '/project/$projectId/_nosidebar/branches'
+      path: '/branches'
       fullPath: '/project/$projectId/branches'
-      preLoaderRoute: typeof ProjectLayoutProjectIdBranchesRouteImport
-      parentRoute: typeof ProjectLayoutRoute
+      preLoaderRoute: typeof ProjectProjectIdNosidebarBranchesRouteImport
+      parentRoute: typeof ProjectProjectIdNosidebarRoute
     }
   }
 }
@@ -379,42 +392,6 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
-interface ProjectLayoutRouteChildren {
-  ProjectLayoutProjectIdBranchesRoute: typeof ProjectLayoutProjectIdBranchesRoute
-  ProjectLayoutProjectIdDatabaseRoute: typeof ProjectLayoutProjectIdDatabaseRoute
-  ProjectLayoutProjectIdDeploymentsRoute: typeof ProjectLayoutProjectIdDeploymentsRoute
-  ProjectLayoutProjectIdMembersRoute: typeof ProjectLayoutProjectIdMembersRoute
-  ProjectLayoutProjectIdMonitoringRoute: typeof ProjectLayoutProjectIdMonitoringRoute
-  ProjectLayoutProjectIdSecurityRoute: typeof ProjectLayoutProjectIdSecurityRoute
-  ProjectLayoutProjectIdIndexRoute: typeof ProjectLayoutProjectIdIndexRoute
-}
-
-const ProjectLayoutRouteChildren: ProjectLayoutRouteChildren = {
-  ProjectLayoutProjectIdBranchesRoute: ProjectLayoutProjectIdBranchesRoute,
-  ProjectLayoutProjectIdDatabaseRoute: ProjectLayoutProjectIdDatabaseRoute,
-  ProjectLayoutProjectIdDeploymentsRoute:
-    ProjectLayoutProjectIdDeploymentsRoute,
-  ProjectLayoutProjectIdMembersRoute: ProjectLayoutProjectIdMembersRoute,
-  ProjectLayoutProjectIdMonitoringRoute: ProjectLayoutProjectIdMonitoringRoute,
-  ProjectLayoutProjectIdSecurityRoute: ProjectLayoutProjectIdSecurityRoute,
-  ProjectLayoutProjectIdIndexRoute: ProjectLayoutProjectIdIndexRoute,
-}
-
-const ProjectLayoutRouteWithChildren = ProjectLayoutRoute._addFileChildren(
-  ProjectLayoutRouteChildren,
-)
-
-interface ProjectRouteChildren {
-  ProjectLayoutRoute: typeof ProjectLayoutRouteWithChildren
-}
-
-const ProjectRouteChildren: ProjectRouteChildren = {
-  ProjectLayoutRoute: ProjectLayoutRouteWithChildren,
-}
-
-const ProjectRouteWithChildren =
-  ProjectRoute._addFileChildren(ProjectRouteChildren)
-
 interface ProjectsLayoutRouteChildren {
   ProjectsLayoutIndexRoute: typeof ProjectsLayoutIndexRoute
 }
@@ -439,11 +416,68 @@ const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
   ProjectsRouteChildren,
 )
 
+interface ProjectProjectIdNosidebarRouteChildren {
+  ProjectProjectIdNosidebarBranchesRoute: typeof ProjectProjectIdNosidebarBranchesRoute
+  ProjectProjectIdNosidebarDatabaseRoute: typeof ProjectProjectIdNosidebarDatabaseRoute
+  ProjectProjectIdNosidebarDeploymentsRoute: typeof ProjectProjectIdNosidebarDeploymentsRoute
+  ProjectProjectIdNosidebarMembersRoute: typeof ProjectProjectIdNosidebarMembersRoute
+  ProjectProjectIdNosidebarMonitoringRoute: typeof ProjectProjectIdNosidebarMonitoringRoute
+  ProjectProjectIdNosidebarSecurityRoute: typeof ProjectProjectIdNosidebarSecurityRoute
+}
+
+const ProjectProjectIdNosidebarRouteChildren: ProjectProjectIdNosidebarRouteChildren =
+  {
+    ProjectProjectIdNosidebarBranchesRoute:
+      ProjectProjectIdNosidebarBranchesRoute,
+    ProjectProjectIdNosidebarDatabaseRoute:
+      ProjectProjectIdNosidebarDatabaseRoute,
+    ProjectProjectIdNosidebarDeploymentsRoute:
+      ProjectProjectIdNosidebarDeploymentsRoute,
+    ProjectProjectIdNosidebarMembersRoute:
+      ProjectProjectIdNosidebarMembersRoute,
+    ProjectProjectIdNosidebarMonitoringRoute:
+      ProjectProjectIdNosidebarMonitoringRoute,
+    ProjectProjectIdNosidebarSecurityRoute:
+      ProjectProjectIdNosidebarSecurityRoute,
+  }
+
+const ProjectProjectIdNosidebarRouteWithChildren =
+  ProjectProjectIdNosidebarRoute._addFileChildren(
+    ProjectProjectIdNosidebarRouteChildren,
+  )
+
+interface ProjectProjectIdSidebarRouteChildren {
+  ProjectProjectIdSidebarIndexRoute: typeof ProjectProjectIdSidebarIndexRoute
+}
+
+const ProjectProjectIdSidebarRouteChildren: ProjectProjectIdSidebarRouteChildren =
+  {
+    ProjectProjectIdSidebarIndexRoute: ProjectProjectIdSidebarIndexRoute,
+  }
+
+const ProjectProjectIdSidebarRouteWithChildren =
+  ProjectProjectIdSidebarRoute._addFileChildren(
+    ProjectProjectIdSidebarRouteChildren,
+  )
+
+interface ProjectProjectIdRouteChildren {
+  ProjectProjectIdNosidebarRoute: typeof ProjectProjectIdNosidebarRouteWithChildren
+  ProjectProjectIdSidebarRoute: typeof ProjectProjectIdSidebarRouteWithChildren
+}
+
+const ProjectProjectIdRouteChildren: ProjectProjectIdRouteChildren = {
+  ProjectProjectIdNosidebarRoute: ProjectProjectIdNosidebarRouteWithChildren,
+  ProjectProjectIdSidebarRoute: ProjectProjectIdSidebarRouteWithChildren,
+}
+
+const ProjectProjectIdRouteWithChildren =
+  ProjectProjectIdRoute._addFileChildren(ProjectProjectIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
-  ProjectRoute: ProjectRouteWithChildren,
   ProjectsRoute: ProjectsRouteWithChildren,
+  ProjectProjectIdRoute: ProjectProjectIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

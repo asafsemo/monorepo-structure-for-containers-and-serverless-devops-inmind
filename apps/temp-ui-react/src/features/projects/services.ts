@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { CheckCircle, Clock, XCircle } from "lucide-react";
 import React from "react";
-import type { Project } from "./types.ts";
+import type { Project } from "./types";
 
 export const fetchProjects = async (): Promise<Project[]> => {
 	return [

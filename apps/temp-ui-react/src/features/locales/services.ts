@@ -1,15 +1,14 @@
-import i18n from "i18next";
+import i18n, { type Resource } from "i18next";
 import { atom, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { initReactI18next } from "react-i18next";
+import { initReactI18next, useTranslation } from "react-i18next";
 
 const LANGUAGE_STORAGE_KEY = "preferred-language";
 
-const resources: Record<string, Record<string, string>> = {};
+const resources: Resource = {};
 
 let initLang = import.meta.env.VITE_DEFAULT_LANGUAGE || null;
-console.log("🚀 ~ initLang:", initLang)
-const locales = import.meta.glob("./json/*.json", { eager: true });
+const locales = import.meta.glob("./languages/*.json", { eager: true });
 
 for (const el of Object.entries(locales)) {
 	const filename = el[0].split("/").pop();
@@ -18,7 +17,6 @@ for (const el of Object.entries(locales)) {
 	}
 	const lang = filename.replace(".json", "");
 	initLang = initLang || lang;
-	console.log("🚀 ~ initLang:", initLang)
 
 	resources[lang] = (el[1] as any).default;
 }
@@ -79,7 +77,7 @@ export const useLanguageManager = () => {
 			...Object.keys(resources).map((key) => ({
 				code: key,
 				label:
-					resources[key]?.translation?.features?.locales?.languageSelector
+					(resources[key]?.translation as any)?.features?.locales?.languageSelector
 						?.label || key,
 			})),
 		]);
@@ -105,3 +103,8 @@ export const useLanguageManager = () => {
 		availableLanguages,
 	};
 };
+
+export const t = (key: string, defValue: string, values?: Record<string, any>) => {
+	return useTranslation().t(key, defValue, values);
+}
+	

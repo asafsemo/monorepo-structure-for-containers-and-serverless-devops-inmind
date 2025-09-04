@@ -2,9 +2,9 @@ import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Provider as JotaiProvider } from "jotai"; // Renamed to avoid conflict if any
-import { ThemeProvider } from "@/features/theme/containers/theme-provider.tsx";
+import { ThemeProvider } from "@/features/theme/containers/theme-provider";
 import { appStore } from "../integrations/jotaiStore"; // Import your single store
-import TanStackQueryLayout from "../integrations/tanstack-query/layout.tsx";
+import TanStackQueryLayout from "../integrations/tanstack-query/layout";
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	component: () => <GlobalLayout />,

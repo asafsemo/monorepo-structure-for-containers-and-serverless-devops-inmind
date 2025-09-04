@@ -14,23 +14,23 @@
 		"lint": "eslint ."
 	},
 	"devDependencies": {
-		"@pkg/dev-config": "*",
+		"@pkg/dev-config": "workspace:*",
 		"@types/aws-lambda": "^8.10.152",
 		"@types/js-yaml": "^4.0.9",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"@types/source-map-support": "^0.5.10",
 		"aws-lambda": "^1.0.7",
 		"js-yaml": "^4.1.0"
 	},
 	"dependencies": {
-		"@fastify/busboy": "^3.1.1",
-		"@fastify/multipart": "^9.0.3",
+		"@fastify/busboy": "^3.2.0",
+		"@fastify/multipart": "^9.1.0",
 		"@fastify/swagger": "^9.5.1",
 		"@fastify/swagger-ui": "^5.2.3",
 		"awilix": "^12.0.5",
-		"chalk": "^5.4.1",
-		"dotenv": "^17.2.0",
-		"fastify": "^5.4.0",
+		"chalk": "^5.6.0",
+		"dotenv": "^17.2.2",
+		"fastify": "^5.5.0",
 		"fastify-plugin": "^5.0.1",
 		"source-map-support": "^0.5.21"
 	}

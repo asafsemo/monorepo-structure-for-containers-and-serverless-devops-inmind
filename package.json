@@ -10,30 +10,30 @@
         "packages/**"
     ],
     "scripts": {
-		"build": "turbo build --force",
-		"build-backend": "turbo build-backend --force",
-		"root-dev": "yarn install && EXEC_PARAM=exec-dev nodemon",
-		"root-serverless": "yarn install && EXEC_PARAM=exec-serverless nodemon",
-		"root-ui": "yarn install && EXEC_PARAM=exec-ui nodemon",
-		"root-coverage": "yarn install && turbo exec-coverage",
-		"root-api": "yarn install && turbo exec-api",
-		"root-unit": "yarn install && yarn build-backend && turbo exec-unit",
-		"clean": "node clean.js",
-		"g:tsc": "cd $INIT_CWD && tsc-absolute",
-		"g:jasmine": "cd $INIT_CWD && jasmine",
-		"mobile-dev": "./mobile-apps/build-mobile-dev.sh",
-		"mobile-prod": "./mobile-apps/build-mobile-prod.sh",
-		"lint": "eslint ."
+        "build": "turbo build --force",
+        "build-backend": "turbo build-backend --force",
+        "root-dev": "yarn install && EXEC_PARAM=exec-dev nodemon",
+        "root-serverless": "yarn install && EXEC_PARAM=exec-serverless nodemon",
+        "root-ui": "yarn install && EXEC_PARAM=exec-ui nodemon",
+        "root-coverage": "yarn install && turbo exec-coverage",
+        "root-api": "yarn install && turbo exec-api",
+        "root-unit": "yarn install && yarn build-backend && turbo exec-unit",
+        "clean": "node clean.js",
+        "g:tsc": "cd $INIT_CWD && tsc-absolute",
+        "g:jasmine": "cd $INIT_CWD && jasmine",
+        "mobile-dev": "./mobile-apps/build-mobile-dev.sh",
+        "mobile-prod": "./mobile-apps/build-mobile-prod.sh",
+        "lint": "eslint ."
     },
     "devDependencies": {
         "c8": "^10.1.3",
-        "eslint": "^9.31.0",
+        "eslint": "^9.34.0",
         "nodemon": "^3.1.10",
         "prettier": "^3.6.2",
         "rimraf": "^6.0.1",
         "tsc-absolute": "^1.0.1",
-        "turbo": "^2.5.5",
-        "typescript": "^5.8.3"
+        "turbo": "^2.5.6",
+        "typescript": "^5.9.2"
     },
     "dependenciesMeta": {
         "nodemon": {

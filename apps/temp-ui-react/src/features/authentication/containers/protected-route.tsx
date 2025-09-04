@@ -4,11 +4,11 @@ import { authUserStorageKey } from "../services";
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;
-	redirectUrl: string;
+	redirectTo: string;
 }
 
 export const ProtectedRoute = (props: ProtectedRouteProps) => {
-	const { redirectUrl, children } = props;
+	const { redirectTo, children } = props;
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -17,7 +17,7 @@ export const ProtectedRoute = (props: ProtectedRouteProps) => {
 		const authUser = localStorage.getItem(authUserStorageKey);
 		if (!authUser?.length) {
 			navigate({
-				to: redirectUrl,
+				to: redirectTo,
 				search: { redirectTo: location.href },
 				replace: true,
 			});

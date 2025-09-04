@@ -1,5 +1,5 @@
 import { createFileRoute, useLocation } from "@tanstack/react-router";
-import { RegisterContainer } from "@/features/authentication/containers/register-container.tsx";
+import { RegisterContainer } from "@/features/authentication/containers/register-container";
 
 export const Route = createFileRoute("/auth/_layout/register")({
 	component: RouteComponent,

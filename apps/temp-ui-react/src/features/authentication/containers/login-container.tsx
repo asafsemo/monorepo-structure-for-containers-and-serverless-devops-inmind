@@ -3,21 +3,21 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { Button } from "@/components/ui/button.tsx";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Label } from "@/components/ui/label.tsx";
-import type { StrictKeys } from "@/lib/strictKeys.ts";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { StrictKeys } from "@/lib/strictKeys";
+import { getTranslation } from "@/integrations/i18n";
 import { useAuthentication } from "../services";
-import type { EmailLoginCredentials } from "../types.ts";
+import type { EmailLoginCredentials } from "../types";
 
 interface LoginContainerProps {
 	redirectTo?: string;
@@ -39,7 +39,7 @@ if (!_schemaKeysCheck) {
 
 export const LoginContainer = (props: LoginContainerProps) => {
 	const { redirectTo } = props;
-	const { t } = useTranslation();
+	const t = getTranslation();
 
 	const navigate = useNavigate();
 	const { loginEmail, error, isLoading } = useAuthentication();
@@ -71,7 +71,7 @@ export const LoginContainer = (props: LoginContainerProps) => {
 			<Card className="w-full max-w-md">
 				<CardHeader className="space-y-1">
 					<CardTitle className="text-2xl font-bold text-center">
-						{t("features.authentication.loginForm.title")}
+						{t("features.authentication.loginForm.title", "ASAFAAAAA")}
 					</CardTitle>
 					<CardDescription className="text-center">
 						{t("features.authentication.loginForm.subtitle")}

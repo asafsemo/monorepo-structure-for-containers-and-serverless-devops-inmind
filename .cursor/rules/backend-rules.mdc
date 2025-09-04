@@ -1,0 +1,598 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+## AI Response Format Rule
+**IMPORTANT**: When answering any question using these rules, always start your response with:
+**🚀 Backend Typescript Rules - Code Generation** 
+
+
+# TypeScript Backend Monorepo Rules
+
+## Project Structure
+- This is a monorepo with services under `apps/_backend/[service-name]`
+- Shared libraries are in `packages/` folder:
+  - `lib-data`: Data communication objects (DTOs, interfaces) - no external dependencies
+  - `lib-core`: Core shared functionality (JWT validation, utilities)
+  - `lib-db`: Database repositories and connectors
+
+### App-Level Structure (apps/_backend/[service-name])
+
+#### Root Files (apps/_backend/[service-name]/)
+- `.Dockerfile` - Docker containerization instructions
+- `.env` - Environment variables configuration
+- `package.json` - App-specific dependencies and scripts
+- `serverless.yml` - AWS Lambda deployment configuration
+- `tsconfig.json` - TypeScript configuration for the app
+
+#### Source Structure (src/)
+- `lambda_controllers/` - Lambda controllers for AWS deployment (serverless.yaml)
+- `fastify_controllers/` - Controllers for Docker/Fastify deployment
+- `libs/` - App-specific extensions of shared packages libraries
+- `services/` - Business logic used by controllers
+- `runtime_load/` - Dynamic service loading configuration for Docker deployment
+- Use dependency injection throughout the codebase
+
+## Code Conventions
+
+### File Structure
+- Every file with a class must have a `FILENAME` constant at the top:
+```typescript
+const FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+```
+- This constant is used for logging the class name throughout methods
+- Enables use of code snippets with `{FILENAME}` placeholder for consistent logging
+- When moving methods between classes, logging automatically uses correct class name
+
+### Class Structure
+- All classes must extend `ParentBaseObject` or a class that extends `ParentBaseObject`
+- Constructor must always start with `logger: ILogger` parameter
+- All class methods must have `options?: IOptions` as the last parameter
+
+### Class Template
+```typescript
+const FILENconst FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+
+export class ServiceEntitiesTypes extends ParentBaseObject {
+    constructor(
+        logger: ILogger,
+        // other dependencies via DI
+    ) {
+        super(logger);
+    }
+
+    public async methodName(
+        param1: string,
+        param2?: SomeType,
+        options?: IOptions
+    ): Promise<ReturnType> {
+        const funcName = `${FILENAME} - methodName`;
+        const { logger } = this.extractOptions(funcName, options);
+        
+        // method implementation
+    }
+}
+```
+
+### Method Structure
+- Every method should start with:
+  ```typescript
+  const funcName = `${FILENAME} - methodName`;
+  const { logger } = this.extractOptions(funcName, options);
+  ```
+- Use descriptive parameter names and proper TypeScript typing
+- Always handle async operations with proper error handling
+
+### Dependency Injection
+- Use Awilix TypeScript library for IoC (Inversion of Control) in Docker deployments
+- Services should be resolved through DI container, not instantiated directly
+- Lambda functions may require direct instantiation due to serverless constraints
+- Register all dependencies in IoC container during application startup
+
+### Import Organization
+1. Node.js built-in modules
+2. External dependencies (AWS SDK, Fastify, etc.)
+3. Internal packages (`lib-data`, `lib-core`, `lib-db`)
+4. App-level imports (`./libs`, `./services`)
+5. Relative imports from same folder
+6. Type-only imports should use `import type`
+
+### Naming Conventions
+- Classes: PascalCase (e.g., `UserRepository`, `AuthService`)
+- Methods: camelCase (e.g., `getUserById`, `validateToken`)
+- Constants: UPPER_SNAKE_CASE (e.g., `FILENAME`, `DEFAULT_TIMEOUT`)
+- Interfaces: PascalCase with 'I' prefix (e.g., `ILogger`, `IOptions`, `IUserRepository`)
+  - **ALWAYS use 'I' prefix for interfaces** - This makes it immediately clear when injecting dependencies that you're working with an interface contract, improving code readability and understanding
+
+### App Configuration Files
+
+#### .env
+- Environment-specific variables
+- Database connections, API keys, service URLs
+- Should not be committed to version control
+- Use `.env.example` template for required variables
+
+#### package.json
+- App-specific dependencies and versions
+- Build and deployment scripts
+- Should include scripts for:
+  - `build` - TypeScript compilation
+  - `start` - Run Fastify server locally
+  - `dev` - Development mode with hot reload
+  - `deploy` - Serverless deployment
+  - `docker:build` - Build Docker image
+  - `docker:run` - Run Docker container
+
+#### serverless.yml
+- AWS Lambda function definitions
+- Reference lambda_controllers for handlers
+- Environment variables and AWS resource configuration
+- Deployment stages and regions
+
+#### .Dockerfile
+- Multi-stage build for production optimization
+- Install dependencies and build TypeScript
+- Expose appropriate ports for Fastify
+- Use Node.js LTS base images
+
+#### tsconfig.json
+- App-specific TypeScript configuration
+- Extend monorepo base config if available
+- Include proper path mappings for shared libraries
+- Set appropriate build output directory
+
+### App-Level Guidelines
+
+#### lambda_controllers/
+- AWS Lambda handlers for serverless deployment
+- Referenced in `serverless.yaml` configuration
+- Keep handlers thin - delegate to services
+- Follow AWS Lambda best practices for cold starts
+
+#### fastify_controllers/
+- REST API controllers for Docker/Fastify deployment
+- Handle HTTP routing and request/response transformation
+- Delegate business logic to services layer
+- Follow Fastify patterns and conventions
+
+#### libs/
+- App-specific extensions of shared packages
+- Can extend functionality from `lib-core`, `lib-db`, `lib-data`
+- Internal to the specific app only
+- Follow same structure as shared libraries (error.ts, index.ts, etc.)
+
+#### runtime_load/
+- Dynamic service loading configuration for Docker deployment
+- Contains service definitions and startup configurations
+- Enables consistent Docker wrapper that dynamically loads required services
+- Allows same Docker startup process across different apps
+- Contains metadata about which services to initialize and start
+
+#### services/
+- Business logic layer used by both controller types
+- Contains the core application logic
+- Controllers should delegate to services, not contain business logic
+- Services inject repositories and other dependencies
+- Services are dynamically loaded via runtime_load configuration
+
+### Controller Patterns
+
+#### Lambda Controller Template
+```typescript
+const FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+
+// Initialize dependencies at module level (outside handler for reuse)
+// Note: In Docker deployments, use Awilix IoC container instead
+const service = new ExampleService(logger, dependencies);
+
+export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+    const funcName = `${FILENAME} - handler`;
+    
+    try {
+        // Use pre-initialized service
+        const result = await service.processRequest(event.body);
+        
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result)
+        };
+    } catch (error) {
+        logger.error(`${funcName} - Error:`, error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
+    }
+};
+```
+
+#### Fastify Controller Template
+```typescript
+const FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+
+export const ControllerUrls = {
+    healthCheck: '/healthcheck',
+};
+
+export default class ControllerHealthCheck extends ParentBaseObject {
+    constructor(logger: ILogger, fastify: FastifyInstance) {
+        super(logger);
+        
+        fastify.get(ControllerUrls.healthCheck, {}, (request: FastifyRequest, reply: FastifyReply) => {
+            return healthCheck(request, reply);
+        });
+    }
+}
+
+const healthCheck = (request: FastifyRequest, reply: FastifyReply) => {
+    const {
+        // iocManager,
+        logger,
+    } = request.extraData;
+    
+    logger.debug('controller - healthcheck');
+    logger.info(`Running HealthCheck`);
+    
+    const app_version = process.env['COMMIT_ID'] || 'func_app';
+    const resBody = { status: 'ok', version: app_version };
+    
+    return reply.code(200).send(resBody);
+};
+```
+
+### Library File Structure
+Each library (`lib-data`, `lib-core`, `lib-db`) must have these standard files:
+
+- `error.ts` - All custom errors for the library
+- `index.ts` - Barrel export file for external consumption
+- `internals.ts` - Internal interfaces and types (not exported)
+- `interfaces.ts` - Public interfaces and types (exported via index.ts)
+- Logic classes - Shared implementation classes
+
+#### File Responsibilities
+
+**error.ts**
+- Define all custom error classes for the library
+- Extend appropriate base error classes
+- Follow naming convention: `[Feature]Error` (e.g., `ValidationError`, `DatabaseError`)
+
+**index.ts** 
+- Barrel exports for public API
+- Export from `interfaces.ts` and logic classes
+- Do NOT export from `internals.ts`
+- Keep exports organized by category
+
+**internals.ts**
+- Internal-only interfaces and types
+- Implementation details not meant for external use
+- Can be imported by other files within the same library
+
+**interfaces.ts**
+- Public interfaces and types for external consumption
+- Exported through `index.ts`
+- Define contracts that external services will depend on
+
+### Library-Specific Rules
+
+#### lib-data
+- Pure data objects and interfaces only
+- No business logic or external dependencies
+- Use for DTOs, API contracts, and shared types
+- Focus on data transfer and communication contracts
+
+#### lib-core
+- Shared utilities and core functionality
+- Can depend on lib-data
+- Include authentication, validation, common helpers
+- Business logic that's shared across services
+
+#### lib-db
+- Repository implementations and database connectors
+- Inject database connections, don't create them
+- Use repository pattern consistently
+- Database-specific logic and data access patterns
+
+### Error Handling
+- Use structured logging with the injected logger
+- Include `funcName` in log messages for traceability
+- Throw typed errors with proper error messages
+- Handle async operations with proper try-catch blocks
+
+### TypeScript Best Practices
+- Use strict TypeScript configuration
+- Prefer interfaces over types for object shapes
+- Use union types for controlled values
+- Always type return values for public methods
+- Use generic types where appropriate
+
+### Testing Guidelines
+- Mock dependencies using DI container
+- Test each layer independently
+- Use descriptive test names following the pattern: `should [expected behavior] when [condition]`
+
+## Code Generation Instructions
+When creating new:
+
+### Lambda Controllers
+- Keep handlers thin and focused
+- Delegate business logic to services
+- Handle AWS Lambda event/context properly
+- Include proper error handling and logging
+- Reference in serverless.yaml for deployment
+
+### Fastify Controllers
+- Extend ParentBaseObject if following class pattern
+- Handle Fastify request/reply objects
+- Delegate to services layer
+- Follow established method signature patterns
+- Register with Fastify routing
+
+### Services
+- Extend appropriate base class
+- Follow constructor and method patterns
+- Include proper logging and error handling
+- Use dependency injection for all external dependencies
+- Contains business logic used by both controller types
+
+### App-Level Libraries (libs/)
+- Follow same structure as shared libraries
+- Can extend or specialize shared package functionality
+- Include standard files: error.ts, index.ts, internals.ts, interfaces.ts
+- Keep app-specific and don't export to other apps
+
+### Runtime Load Configuration (runtime_load/)
+- Define service loading configurations for Docker deployment
+- Specify which services should be initialized and started
+- Enable consistent Docker wrapper across different apps
+- Contains metadata and bootstrap configuration for dynamic service loading
+
+### Repositories
+- Implement repository pattern
+- Inject database connector
+- Include comprehensive error handling
+- Follow the established method signature patterns
+
+### Utilities
+- Place in appropriate library (lib-core for shared utilities)
+- Follow established patterns for logging and options
+- Include proper TypeScript typing
+
+## File Templates
+
+### App package.json Template
+```json
+{
+  "name": "@backend/service-name",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/fastify-server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/fastify-server.ts",
+    "deploy": "serverless deploy",
+    "docker:build": "docker build -f .Dockerfile -t service-name .",
+    "docker:run": "docker run -p 3000:3000 service-name"
+  },
+  "dependencies": {
+    "@backend/lib-core": "workspace:*",
+    "@backend/lib-data": "workspace:*",
+    "@backend/lib-db": "workspace:*"
+  }
+}
+```
+
+### App .env.example Template
+```bash
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=service_db
+DB_USER=service_user
+DB_PASSWORD=
+
+# Service Configuration
+PORT=3000
+NODE_ENV=development
+LOG_LEVEL=debug
+
+# External Services
+JWT_SECRET=
+API_BASE_URL=
+
+# AWS (for serverless deployment)
+AWS_REGION=us-east-1
+AWS_STAGE=dev
+```
+
+### App serverless.yml Template
+```yaml
+service: backend-service-name
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${env:AWS_REGION, 'us-east-1'}
+  stage: ${env:AWS_STAGE, 'dev'}
+
+functions:
+  exampleHandler:
+    handler: dist/lambda_controllers/ExampleController.handler
+    events:
+      - http:
+          path: /api/example
+          method: post
+    environment:
+      NODE_ENV: ${env:NODE_ENV}
+      DB_HOST: ${env:DB_HOST}
+
+plugins:
+  - serverless-offline
+```
+
+### App .Dockerfile Template
+```dockerfile
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:18-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+COPY tsconfig.json ./
+RUN npm ci
+COPY src/ ./src/
+RUN npm run build
+
+FROM node:18-alpine AS production
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY package*.json ./
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### App tsconfig.json Template
+```json
+{
+  "extends": "@pkg/dev-config/backend-tsconfig.service.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "paths": {
+      "@/libs/*": ["./libs/*"],
+      "@/services/*": ["./services/*"],
+      "@backend/lib-core": ["../../packages/lib-core"],
+      "@backend/lib-data": ["../../packages/lib-data"],
+      "@backend/lib-db": ["../../packages/lib-db"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Library index.ts Template
+```typescript
+// Public interfaces and types
+export * from './interfaces';
+
+// Logic classes
+export * from './SomeLogicClass';
+export * from './AnotherSharedClass';
+
+// Errors
+export * from './error';
+
+// DO NOT export from internals.ts
+```
+
+### Library interfaces.ts Template
+```typescript
+// Public interfaces for external consumption
+export interface IPublicService {
+    method(param: string, options?: IOptions): Promise<void>;
+}
+
+export interface IPublicRepository {
+    findById(id: string, options?: IOptions): Promise<EntityType | null>;
+}
+
+// Public types
+export type PublicDataType = {
+    id: string;
+    name: string;
+};
+```
+
+### Library internals.ts Template
+```typescript
+// Internal-only interfaces and types
+interface IInternalHelper {
+    privateMethod(): void;
+}
+
+type InternalConfig = {
+    setting: string;
+    value: number;
+};
+
+// These are NOT exported in index.ts
+```
+
+### Library error.ts Template
+```typescript
+const FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+
+export class ValidationError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ValidationError';
+    }
+}
+
+export class NotFoundError extends Error {
+    constructor(resource: string, id: string) {
+        super(`${resource} with id ${id} not found`);
+        this.name = 'NotFoundError';
+    }
+}
+```
+
+### Service Class
+```typescript
+const FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+
+export class ExampleService extends ParentBaseObject {
+    constructor(
+        logger: ILogger,
+        private repository: IExampleRepository,
+        private otherDependency: IOtherService
+    ) {
+        super(logger);
+    }
+
+    public async performAction(
+        input: string,
+        options?: IOptions
+    ): Promise<ResultType> {
+        const funcName = `${FILENAME} - performAction`;
+        const { logger } = this.extractOptions(funcName, options);
+
+        try {
+            // implementation
+        } catch (error) {
+            logger.error(`${funcName} - Error:`, error);
+            throw error;
+        }
+    }
+}
+```
+
+### Repository Class
+```typescript
+const FILENAME = path.basename(import.meta.filename, path.extname(import.meta.filename));
+
+export class ExampleRepository extends ParentBaseObject implements IExampleRepository {
+    constructor(
+        logger: ILogger,
+        private dbConnector: IDbConnector
+    ) {
+        super(logger);
+    }
+
+    public async findById(
+        id: string,
+        options?: IOptions
+    ): Promise<EntityType | null> {
+        const funcName = `${FILENAME} - findById`;
+        const { logger } = this.extractOptions(funcName, options);
+
+        // repository implementation
+    }
+}
+```
+
+Always follow these patterns and conventions when generating or modifying code.

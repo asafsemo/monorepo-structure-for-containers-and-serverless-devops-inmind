@@ -27,7 +27,7 @@ CREATE: src/features/authentication/containers/login-container.tsx
 CREATE: src/features/authentication/services.ts
 CREATE: src/features/authentication/types.ts
 CREATE: src/features/authentication/index.ts
-UPDATE: src/locales/en.json (add new translations)
+UPDATE: src/features/locales/languages/en.json (add new translations)
 CREATE: src/routes/auth/_layout/login.tsx
 CREATE: src/routes/auth/_layout.tsx
 
@@ -57,12 +57,21 @@ src/
 │   └── ui/          # Shadcn components
 ├── features/        # Feature-based modules
 │   └── [feature-name]/
-│       ├── components/  # "Dumb" components - UI only, props in/out
-│       ├── containers/  # "Smart" components - business logic, API calls
+│       ├── components/  # Reusable UI components (extract when needed)
+│       ├── containers/  # Entry points with business logic + UI rendering
 │       ├── services.ts  # Business logic, API calls, and Jotai atoms
 │       ├── types.ts     # TypeScript type definitions
 │       └── index.ts     # Feature exports
-├── locales/         # i18n translations (JSON)
+│   └── locales/     # i18n translations feature (optional)
+│       ├── components/  # Language selector, locale switcher components
+│       ├── containers/  # Locale management containers
+│       ├── services.ts  # Locale state management and i18n setup
+│       ├── types.ts     # Locale-related types
+│       ├── languages/     # Translation files (JSON)
+│       │   ├── en.json
+│       │   ├── es.json
+│       │   └── ...
+│       └── index.ts     # Locale feature exports
 ├── utils/           # Utility functions
 └── assets/          # Static assets (images, JS)
 ```
@@ -78,26 +87,50 @@ src/
    ```
 
 
-### Components vs Containers Architecture
+### Pragmatic Components vs Containers Architecture
+
+### **When to Extract Components vs Keep in Containers**
+
+#### **Containers Can Include UI Rendering Directly**
+- ✅ **Containers can contain both business logic AND UI rendering**
+- ✅ **No requirement to extract every UI element to separate components**
+- ✅ **Start with everything in containers, extract when needed**
+
+#### **Extract to Components When:**
+1. **Code Reuse**: The same UI pattern is used in 2+ different containers/components
+2. **File Size**: A single container exceeds ~400-420 lines of code
+3. **Complex UI Logic**: UI has complex form validation, multi-step wizards, or intricate interactions
+4. **Independent Testing**: UI logic is complex enough to warrant isolated testing
+
+#### **Don't Extract Components For:**
+- ❌ Simple, container-specific UI that's only used once
+- ❌ Basic forms with standard fields (keep in container)
+- ❌ UI that's tightly coupled to specific business logic
+- ❌ Following architecture patterns without practical benefit
 
 ### Components Folder (`features/[feature-name]/components/`)
-- **"Dumb" or presentational components**
-- Focus solely on UI rendering and user interactions
+**Purpose**: Reusable UI components extracted for code sharing or size management
+
+**Characteristics**:
+- **"Dumb" components** - UI rendering only, no business logic
+- **Reusable** across multiple containers/components  
+- **Self-contained** UI logic only: `useForm`, `useTranslation`, `useState`, `zod`
+- **NO** business logic from `services.ts`, API calls, or Jotai business atoms
+- Receive data via props, emit events via callbacks
 - **ALLOWED EXTERNAL LOGIC ONLY:**
   - `useForm` from `react-hook-form` (for form handling)
   - `useTranslation` from `react-i18next` (for translations)
   - `useState` from `react` (for local UI state only)
   - `zod` schema validation (for form validation)
-- **CANNOT** use any business logic from `services.ts`
-- **CANNOT** make API calls or external service calls
-- **CANNOT** use Jotai atoms for business state
-- Receive data via props, emit events via prop callbacks
-- Can contain sub-components but NOT sub-containers
-- Should be highly reusable and testable
+
+**Extract When**:
+- Same UI pattern used in multiple places
+- Container file exceeds ~400 lines
+- Complex UI logic needs isolated testing
 
 ```tsx
 // ✅ CORRECT: features/projects/components/project-card.tsx
-import { useTranslation } from 'react-i18next'
+import { getTranslation } from '#/lib/utils.ts'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Project } from '../types'
@@ -111,7 +144,7 @@ interface ProjectCardProps {
 
 export const ProjectCard = (props: ProjectCardProps) => {
   const { project, onEdit, onDelete, isLoading = false } = props
-  const { t } = useTranslation()
+  const t = getTranslation()
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -127,7 +160,7 @@ export const ProjectCard = (props: ProjectCardProps) => {
             disabled={isLoading}
             data-testid="edit-project-button"
           >
-            {t('common.buttons.edit')}
+            {t('common.buttons.edit', 'Edit')}
           </Button>
           <Button 
             variant="destructive" 
@@ -135,7 +168,7 @@ export const ProjectCard = (props: ProjectCardProps) => {
             disabled={isLoading}
             data-testid="delete-project-button"
           >
-            {t('common.buttons.delete')}
+            {t('common.buttons.delete', 'Delete')}
           </Button>
         </div>
       </CardContent>
@@ -147,7 +180,7 @@ export const ProjectCard = (props: ProjectCardProps) => {
 ```tsx
 // ✅ CORRECT: Component with form handling
 import { useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { getTranslation } from '#/lib/utils.ts'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -169,7 +202,7 @@ interface ProjectFormProps {
 
 export const ProjectForm = (props: ProjectFormProps) => {
   const { initialData, onSubmit, isSubmitting = false } = props
-  const { t } = useTranslation()
+  const t = getTranslation()
   
   const { register, handleSubmit, formState: { errors } } = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -181,7 +214,7 @@ export const ProjectForm = (props: ProjectFormProps) => {
       <div>
         <Input
           {...register('name')}
-          placeholder={t('features.projects.form.namePlaceholder')}
+          placeholder={t('features.projects.form.namePlaceholder', 'Enter project name')}
           data-testid="project-name-input"
         />
         {errors.name && <p className="text-red-500">{errors.name.message}</p>}
@@ -190,7 +223,7 @@ export const ProjectForm = (props: ProjectFormProps) => {
       <div>
         <Input
           {...register('description')}
-          placeholder={t('features.projects.form.descriptionPlaceholder')}
+          placeholder={t('features.projects.form.descriptionPlaceholder', 'Enter project description')}
           data-testid="project-description-input"
         />
         {errors.description && <p className="text-red-500">{errors.description.message}</p>}
@@ -201,7 +234,7 @@ export const ProjectForm = (props: ProjectFormProps) => {
         disabled={isSubmitting}
         data-testid="submit-project-button"
       >
-        {isSubmitting ? t('common.messages.loading') : t('common.buttons.submit')}
+        {isSubmitting ? t('common.messages.loading', 'Loading...') : t('common.buttons.submit', 'Submit')}
       </Button>
     </form>
   )
@@ -209,109 +242,171 @@ export const ProjectForm = (props: ProjectFormProps) => {
 ```
 
 ### Containers Folder (`features/[feature-name]/containers/`)
-- **"Smart" components with business logic**
-- **MUST** import and use business logic from `services.ts`
-- **MUST** use Jotai atoms for state management
-- Handle data fetching, API calls, and complex business logic
-- Can communicate with external services and other parts of the app
-- Can contain both sub-components AND sub-containers
-- Handle user interactions and coordinate between multiple components
-- **ALLOWED EXTERNAL LOGIC:**
-  - All business logic from `services.ts`
-  - Jotai atoms (`useAtom`, `useAtomValue`, `useSetAtom`)
-  - `useTranslation` from `react-i18next`
-  - `useState` for local container state (sparingly)
+**Purpose**: Feature entry points that handle business logic AND can include UI rendering
+
+**Characteristics**:
+- **"Smart" components** with business logic from `services.ts`
+- **Can include direct UI rendering** when appropriate
+- **Use Jotai atoms** for state management
+- **Handle API calls** and complex business logic
+- **Coordinate** between multiple components when needed
+
+**Contains**:
+- Business logic + API calls + state management
+- Direct UI rendering (when not extracted to components)
+- Composition of multiple reusable components
+- User interaction handlers
 
 ```tsx
-// ✅ CORRECT: features/projects/containers/projects-list-container.tsx
-import { useTranslation } from 'react-i18next'
-import { useAtomValue } from 'jotai'
-import { ProjectCard } from '../components/project-card'
-import { ProjectForm } from '../components/project-form'
-import { useProjectsList, useProjectsDelete, useProjectsCreate, $projectsAtom, $loadingAtom } from '../services'
-import type { Project } from '../types'
+// ✅ GOOD: Container with direct UI rendering (no extraction needed)
+import { getTranslation } from '#/lib/utils.ts'
 
-interface ProjectsListContainerProps {
-  projects?: Project[]
-  children?: React.ReactNode
-}
-
-export const ProjectsListContainer = (props: ProjectsListContainerProps) => {
-  const { projects: externalProjects, children } = props
-  const { t } = useTranslation()
+export const ProjectCreateContainer = () => {
+  const t = getTranslation()
+  const { createProject, isLoading, error } = useProjectsCreate()
   
-  // Use external projects or fall back to atom state
-  const atomProjects = useAtomValue($projectsAtom)
-  const projects = externalProjects || atomProjects
-  const loading = useAtomValue($loadingAtom)
-  
-  // Business logic from services.ts
-  const { loadProjects } = useProjectsList()
-  const { deleteProject } = useProjectsDelete()
-  const { createProject } = useProjectsCreate()
+  const { register, handleSubmit, formState: { errors } } = useForm<ProjectData>({
+    resolver: zodResolver(projectSchema)
+  })
 
-  const handleEdit = async (project: Project) => {
-    // Handle edit logic - could open modal, navigate, etc.
-    console.log('Edit project:', project)
-  }
-
-  const handleDelete = async (projectId: string) => {
-    try {
-      await deleteProject(projectId)
-    } catch (error) {
-      console.error('Failed to delete project:', error)
-    }
-  }
-
-  const handleCreateProject = async (data: ProjectFormData) => {
+  const onSubmit = async (data: ProjectData) => {
     try {
       await createProject(data)
+      // Handle success
     } catch (error) {
-      console.error('Failed to create project:', error)
+      // Handle error
     }
-  }
-
-  if (loading) {
-    return <div>{t('common.messages.loading')}</div>
   }
 
   return (
-    <div className="space-y-6">
-      {children}
-      
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">
-          {t('features.projects.createProject')}
-        </h2>
-        <ProjectForm onSubmit={handleCreateProject} isSubmitting={loading} />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {projects.map(project => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            isLoading={loading}
-          />
-        ))}
-      </div>
-    </div>
+    <Card className="max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>{t('features.projects.create.title', 'Create New Project')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <Input
+              {...register('name')}
+              placeholder={t('features.projects.create.namePlaceholder', 'Enter project name')}
+              data-testid="project-name-input"
+            />
+            {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+          </div>
+          
+          <div>
+            <Textarea
+              {...register('description')}
+              placeholder={t('features.projects.create.descriptionPlaceholder', 'Enter project description')}
+              data-testid="project-description-input"
+            />
+            {errors.description && <p className="text-red-500">{errors.description.message}</p>}
+          </div>
+          
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            data-testid="create-project-button"
+            className="w-full"
+          >
+            {isLoading ? t('common.messages.loading', 'Loading...') : t('features.projects.create.submitButton', 'Create Project')}
+          </Button>
+          
+          {error && <p className="text-red-500">{error}</p>}
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 ```
+
+```tsx
+// ✅ GOOD: Extract to component when reused across multiple containers
+// features/projects/components/project-form.tsx
+interface ProjectFormProps {
+  initialData?: Partial<Project>
+  onSubmit: (data: ProjectFormData) => void
+  isSubmitting?: boolean
+  submitButtonText?: string
+}
+
+export const ProjectForm = (props: ProjectFormProps) => {
+  const { initialData, onSubmit, isSubmitting = false, submitButtonText } = props
+  const t = getTranslation()
+  
+  // Only UI logic here - no business logic
+  const { register, handleSubmit, formState: { errors } } = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: initialData
+  })
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Form fields */}
+      <Button type="submit" disabled={isSubmitting} data-testid="submit-button">
+        {isSubmitting ? t('common.messages.loading', 'Loading...') : (submitButtonText || t('common.buttons.submit', 'Submit'))}
+      </Button>
+    </form>
+  )
+}
+
+// Used in multiple containers:
+// - ProjectCreateContainer
+// - ProjectEditContainer  
+// - ProjectDuplicateContainer
+```
+
+### Decision Tree for Component Extraction
+
+```markdown
+## Should I Extract This UI to a Component?
+
+1. **Is this UI used in multiple containers/components?**
+   - YES → Extract to component
+   - NO → Continue to question 2
+
+2. **Is my container file over ~400 lines?**
+   - YES → Extract logical UI sections to components
+   - NO → Continue to question 3
+
+3. **Is the UI logic complex enough to need isolated testing?**
+   - YES → Consider extracting to component
+   - NO → Continue to question 4
+
+4. **Is this a common UI pattern (forms, cards, lists) that might be reused later?**
+   - YES → Consider extracting to component for future reuse
+   - NO → Keep in container
+
+If all answers are NO → **Keep UI in container**
+```
+
+### File Size Management Guidelines
+
+**Containers**: Keep under ~400-420 lines
+- When exceeded, extract logical UI sections to components
+- Focus on extracting reusable patterns first
+- Consider splitting complex business logic to additional services
+
+**Components**: Keep under ~300 lines  
+- Break down into smaller, focused components
+- Use composition patterns with children props
+
+**Services**: Keep under ~600 lines
+- When exceeded, split into services/ directory structure
+- Group related functionality together
+- Maintain clear separation of concerns
 
 ### Key Differences Summary
 
 | Aspect | Components | Containers |
 |--------|------------|------------|
-| **Purpose** | UI rendering & user interaction | Business logic & data management |
+| **Purpose** | Reusable UI for code sharing | Business logic + UI (can be direct) |
+| **When to Create** | Code reuse, file size, complexity | Feature entry points, always |
 | **External Logic** | Only: `useForm`, `useTranslation`, `useState`, `zod` | All business logic from `services.ts` + Jotai atoms |
 | **API Calls** | ❌ Never | ✅ Always through services.ts |
 | **Jotai Atoms** | ❌ No business atoms | ✅ All business state atoms |
 | **Data Source** | Props only | Props + atoms + API calls |
-| **Sub-components** | ✅ Components only | ✅ Components + Containers |
+| **UI Rendering** | ✅ Always | ✅ Can include direct UI or use components |
 | **Reusability** | ✅ Highly reusable | ⚠️ Feature-specific |
 | **Testing** | Easy (props in/events out) | Complex (mocked dependencies) |
 
@@ -337,6 +432,16 @@ export const ProjectsListContainer = () => {
     fetch('/api/projects').then(/* ... */)
   }, [])
   // ...
+}
+```
+
+```tsx
+// ❌ WRONG: Extracting components unnecessarily
+// Don't create ProjectCreateForm component if it's only used in one container
+// and the container file is under 400 lines
+export const ProjectCreateForm = (props) => {
+  // This form is only used in ProjectCreateContainer
+  // Keep it directly in the container instead
 }
 ```
 
@@ -435,76 +540,247 @@ function RouteComponent() {
 }
 ```
 
-### Internationalization Requirements
+### Internationalization Requirements (Optional Feature)
 
-#### Always Use Translation Hook
-**CRITICAL**: All user-facing text in components and containers MUST use translations:
+#### Localization as a Feature
+Internationalization is now implemented as an optional `locales` feature. Projects can choose to include or exclude localization support based on requirements.
+
+#### Projects WITH Locale Support
+
+**Always Use getTranslation Function**
+all user-facing text in components and containers MUST use the getTranslation function:
 
 ```tsx
-import { useTranslation } from 'react-i18next'
+import { getTranslation } from '#/lib/utils.ts'
 
 export const MyComponent = () => {
-  const { t } = useTranslation()
+  const t = getTranslation()
   
   return (
     <div>
-      <h1>{t('features.projects.title')}</h1>
-      <Button>{t('common.buttons.save')}</Button>
+      <h1>{t('features.projects.title', 'Projects')}</h1>
+      <Button>{t('common.buttons.save', 'Save')}</Button>
     </div>
   )
 }
 ```
 
-#### Update Language Files
-When creating components with text, always update the language files:
+**CRITICAL REQUIREMENTS:**
+- Always import `getTranslation` from `#/lib/utils.ts`
+- Always call `const t = getTranslation()` (not destructured)
+- Every text MUST have both a translation key AND a default value
+- Format: `t('translation.key', 'Default Text')`
+- NEVER use hardcoded strings without translation keys
 
+## Translation Key Naming Conventions
+
+### **Root Structure**
+The translation JSON should follow this hierarchy:
 ```json
-// locales/en.json
 {
-  "common": {
-    "buttons": {
-      "save": "Save",
-      "cancel": "Cancel",
-      "submit": "Submit",
-      "delete": "Delete",
-      "edit": "Edit",
-      "create": "Create",
-      "update": "Update"
+  "translation": {
+    "common": { /* shared across app */ },
+    "features": { /* feature-specific */ },
+    "pages": { /* page/route-specific */ },
+    "components": { /* reusable component-specific */ },
+    "errors": { /* error messages */ }
+  }
+}
+```
+
+### **Key Naming Rules**
+
+#### **Use camelCase for all keys:**
+```json
+// ✅ CORRECT
+"emailLabel": "Email Address"
+"submitButton": "Submit"
+"passwordPlaceholder": "Enter your password"
+
+// ❌ WRONG
+"email_label": "Email Address"
+"submit-button": "Submit"
+"password.placeholder": "Enter your password"
+```
+
+#### **Use descriptive, semantic names:**
+```json
+// ✅ CORRECT - Describes the purpose/content
+"loginForm": {
+  "title": "Welcome Back",
+  "emailLabel": "Email Address",
+  "submitButton": "Sign In"
+}
+
+// ❌ WRONG - Generic or unclear
+"form1": {
+  "text1": "Welcome Back",
+  "input1": "Email Address",
+  "btn1": "Sign In"
+}
+```
+
+### **Hierarchical Key Patterns**
+
+#### **For Features:**
+```
+features.{featureName}.{componentOrContainer}.{elementType}
+```
+
+**Examples:**
+```json
+"features": {
+  "authentication": {
+    "loginForm": {
+      "title": "Welcome Back",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "submitButton": "Sign In"
+    },
+    "userMenu": {
+      "profile": "Profile",
+      "settings": "Settings", 
+      "logout": "Logout"
     },
     "messages": {
-      "loading": "Loading...",
-      "error": "Something went wrong",
-      "success": "Operation completed successfully",
-      "noData": "No data available"
+      "loginSuccess": "Successfully logged in!",
+      "loginError": "Invalid credentials"
     }
   },
-  "features": {
-    "projects": {
-      "title": "Projects",
-      "createProject": "Create New Project",
-      "projectCard": {
-        "editButton": "Edit Project",
-        "deleteButton": "Delete Project",
-        "viewButton": "View Details"
-      },
-      "projectsList": {
-        "title": "All Projects",
-        "searchPlaceholder": "Search projects...",
-        "noProjects": "No projects found"
-      }
+  "projects": {
+    "projectsList": {
+      "title": "My Projects",
+      "subtitle": "Manage and monitor your projects",
+      "searchPlaceholder": "Search projects...",
+      "noProjects": "No projects found"
     },
-    "authentication": {
-      "loginForm": {
-        "title": "Login to your account",
-        "emailLabel": "Email",
-        "passwordLabel": "Password",
-        "submitButton": "Sign In",
-        "forgotPassword": "Forgot your password?"
-      }
+    "projectCard": {
+      "viewDetails": "View Details",
+      "editProject": "Edit Project",
+      "openProject": "Open Project",
+      "membersCount": "{count} members",
+      "deploymentsCount": "{count} deployments"
     }
   }
 }
 ```
+
+#### **For Common Elements:**
+```json
+"common": {
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel", 
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Operation completed successfully",
+    "noData": "No data available"
+  },
+  "forms": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password is too short"
+  }
+}
+```
+
+#### **For Pages/Routes:**
+```json
+"pages": {
+  "home": {
+    "title": "Welcome to React",
+    "subtitle": "A modern React application"
+  },
+  "auth": {
+    "login": {
+      "pageTitle": "Sign In - My App",
+      "metaDescription": "Sign in to access your account"
+    }
+  }
+}
+```
+
+### **Element Type Suffixes**
+
+Use consistent suffixes to indicate UI element types:
+
+```json
+{
+  "title": "Main heading text",
+  "subtitle": "Secondary heading text", 
+  "description": "Descriptive text",
+  "label": "Form field labels",
+  "placeholder": "Input placeholder text",
+  "button": "Button text",
+  "link": "Link text",
+  "message": "Status/feedback messages",
+  "tooltip": "Tooltip text",
+  "alt": "Alt text for images"
+}
+```
+
+### **Translation Key Usage in Code**
+
+#### **Always use the full path with default value:**
+```tsx
+// ✅ CORRECT
+const t = getTranslation()
+return (
+  <h1>{t('features.projects.projectsList.title', 'My Projects')}</h1>
+)
+```
+
+#### **For interpolated values:**
+```tsx
+// ✅ CORRECT - Use interpolation
+const t = getTranslation()
+return (
+  <span>{t('features.projects.projectCard.membersCount', '{count} members', { count: project.members })}</span>
+)
+```
+
+### **Mapping to Codebase Structure**
+
+Translation keys should map to your feature structure:
+
+```
+src/features/authentication/
+├── components/
+│   └── user-menu.tsx → features.authentication.userMenu.*
+├── containers/
+│   ├── login-container.tsx → features.authentication.loginForm.*
+│   └── register-container.tsx → features.authentication.signupForm.*
+
+src/features/projects/
+├── components/
+│   └── projects-list.tsx → features.projects.projectsList.*
+├── containers/
+│   └── project-*.tsx → features.projects.{containerName}.*
+
+src/routes/
+├── auth/ → pages.auth.*
+├── projects/ → pages.projects.*
+└── index.tsx → pages.home.*
+```
+
+### **Validation Rules**
+
+1. **No missing default values** - Every `t()` call must have a default value
+2. **No hardcoded strings** - All user-facing text must use translation keys
+3. **Consistent key structure** - Follow the hierarchical naming pattern
+4. **No duplicate keys** - Each key should be unique and used consistently
+5. **Key existence validation** - All translation keys should exist in all language files
+
+**Update Language Files**
+When creating components with text, always update the language files in the locales feature following the above conventions.
 
 ### Standard Atoms Pattern for Services
 
@@ -642,18 +918,20 @@ export const useProjectsDelete = () => {
      onSave?: (user: User) => void
    }
    
+   import { getTranslation } from '#/lib/utils.ts'
+   
    export const UserProfile = (props: UserProfileProps) => {
      const { 
        user, 
        isEditing = false, 
        onSave 
      } = props
-     const { t } = useTranslation() // Always use translations
+     const t = getTranslation() // Always use getTranslation for projects with locales
      
      // Component logic here
      return (
        <div>
-         <h1>{t('features.users.profile.title')}</h1>
+         <h1>{t('features.users.profile.title', 'User Profile')}</h1>
          {/* Component JSX */}
        </div>
      )
@@ -746,7 +1024,7 @@ Always add data-testid attribute to user input components, like: button, input, 
      const [user, setUser] = useAtom($userAtom)
      const isAuthenticated = useAtomValue($isAuthenticatedAtom)
      const { login } = useAuthLogin()
-     const { t } = useTranslation()
+     const t = getTranslation()
      
      const handleSubmit = async (credentials: LoginCredentials) => {
        try {
@@ -760,7 +1038,7 @@ Always add data-testid attribute to user input components, like: button, input, 
      return (
        <div>
          {isAuthenticated ? (
-           <p>{t('features.auth.welcome', { name: user?.name })}</p>
+           <p>{t('features.auth.welcome', 'Welcome, {userName}!', {u serName: user.name }</p>
          ) : (
            <LoginForm onSubmit={handleSubmit} />
          )}
@@ -774,14 +1052,14 @@ Always add data-testid attribute to user input components, like: button, input, 
    import { useQuery } from '@tanstack/react-query'
    
    export const UserListContainer = () => {
-     const { t } = useTranslation()
+     const t = getTranslation()
      const { data: users, isLoading, error } = useQuery({
        queryKey: ['users'],
        queryFn: getUsersList
      })
      
-     if (isLoading) return <div>{t('common.messages.loading')}</div>
-     if (error) return <div>{t('common.messages.error')}</div>
+     if (isLoading) return <div>{t('common.messages.loading', 'Loading...')}</div>
+     if (error) return <div>{t('common.messages.error', 'Something went wrong')}</div>
      
      return (
        <div>
@@ -1030,7 +1308,7 @@ export const useDataLoad = () => {
    type LoginFormData = z.infer<typeof loginSchema>
    
    export const LoginForm = () => {
-     const { t } = useTranslation()
+     const t = getTranslation()
      const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
        resolver: zodResolver(loginSchema)
      })
@@ -1049,7 +1327,7 @@ export const useDataLoad = () => {
            <Input
              {...register('email')}
              type="email"
-             placeholder={t('features.auth.emailLabel')}
+             placeholder={t('features.auth.emailLabel', 'Email')}
              data-testid="email-input"
            />
            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
@@ -1059,7 +1337,7 @@ export const useDataLoad = () => {
            <Input
              {...register('password')}
              type="password"
-             placeholder={t('features.auth.passwordLabel')}
+             placeholder={t('features.auth.passwordLabel', 'Password')}
              data-testid="password-input"
            />
            {errors.password && <p className="text-red-500">{errors.password.message}</p>}
@@ -1070,7 +1348,7 @@ export const useDataLoad = () => {
            disabled={isSubmitting}
            data-testid="submit-button"
          >
-           {isSubmitting ? t('common.messages.loading') : t('features.auth.submitButton')}
+           {isSubmitting ? t('common.messages.loading', 'Loading...') : t('features.auth.submitButton', 'Sign In')}
          </Button>
        </form>
      )
@@ -1095,10 +1373,10 @@ export const useDataLoad = () => {
 2. **Use data-testid attributes for test selectors**
    ```tsx
    export const SubmitButton = () => {
-     const { t } = useTranslation()
+     const t = getTranslation()
      return (
        <Button data-testid="submit-button" onClick={handleSubmit}>
-         {t('common.buttons.submit')}
+         {t('common.buttons.submit', 'Submit')}
        </Button>
      )
    }
@@ -1117,20 +1395,22 @@ export const useDataLoad = () => {
 8. Include proper TypeScript imports
 9. Do NOT use React.FC type annotation
 10. Use named exports instead of default exports
-11. **Always use `useTranslation` hook for all text**
-12. **Update language files with new translations**
-13. **Place in `components/` folder for dumb components**
-14. Can contain both other components and containers
+11. **Always use `getTranslation()` function for all text**
+12. **Always provide both translation key AND default value**
+13. **For projects WITH locales feature: Update language files with new translations**
+14. **Place in `components/` folder for dumb components**
+15. Can contain both other components and containers
 
 ### When generating containers:
 1. Use TypeScript with proper interface definitions
 2. Import business logic from `services.ts`
 3. Use Jotai atoms for state management
 4. Handle API calls and complex business logic
-5. **Always use `useTranslation` hook for all text**
-6. **Update language files with new translations**
-7. **Place in `containers/` folder for smart components**
-8. Can contain both components and other containers
+5. **Always use `getTranslation()` function for all text**
+6. **Always provide both translation key AND default value**
+7. **For projects WITH locales feature: Update language files with new translations**
+8. **Place in `containers/` folder for smart components**
+9. Can contain both components and other containers
 
 ### When generating services (services.ts):
 1. Always export individual functions for better tree shaking
@@ -1156,11 +1436,11 @@ export const useDataLoad = () => {
 5. **Import API functions from feature services.ts for loaders**
 6. Pass data from loaders to containers via props
 
-### Language File Updates
-When creating any component or container with user-facing text, ALWAYS update the language files:
+### Language File Updates (For Projects WITH Locales Feature)
+When creating any component or container with user-facing text in projects that include the locales feature, ALWAYS update the language files:
 
 ```json
-// locales/en.json - Add translations in appropriate sections
+// features/locales/languages/en.json - Add translations in appropriate sections
 {
   "common": {
     "buttons": { /* common buttons */ },

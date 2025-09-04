@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card.tsx";
+import { Card, CardContent } from "@/components/ui/card";
 import { actionTitles } from "../services";
 
 interface ProjectActionComingSoonProps {

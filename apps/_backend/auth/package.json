@@ -18,17 +18,17 @@
     "node": ">=18.x"
   },
   "devDependencies": {
-    "@pkg/dev-config": "*",
+    "@pkg/dev-config": "workspace:*",
     "@types/aws-lambda": "^8.10.152",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.3.0",
     "@types/source-map-support": "^0.5.10"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^1.18.1",
-    "@aws-lambda-powertools/tracer": "^1.18.1",
-    "@pkg/lib-containers": "*",
-    "@pkg/lib-core": "*",
-    "@pkg/lib-data": "*",
+    "@aws-lambda-powertools/logger": "^2.25.2",
+    "@aws-lambda-powertools/tracer": "^2.25.2",
+    "@pkg/lib-containers": "workspace:*",
+    "@pkg/lib-core": "workspace:*",
+    "@pkg/lib-data": "workspace:*",
     "aws-lambda": "^1.0.7",
     "aws-lambda-response-builder": "^1.0.15",
     "source-map-support": "^0.5.21"

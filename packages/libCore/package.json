@@ -10,11 +10,11 @@
 		"lint": "eslint ."
 	},
 	"devDependencies": {
-		"@pkg/dev-config": "*",
-		"@types/node": "^24.1.0"
+		"@pkg/dev-config": "workspace:*",
+		"@types/node": "^24.3.0"
 	},
 	"dependencies": {
-		"@pkg/lib-containers": "*",
-		"@pkg/lib-data": "*"
+		"@pkg/lib-containers": "workspace:*",
+		"@pkg/lib-data": "workspace:*"
 	}
 }

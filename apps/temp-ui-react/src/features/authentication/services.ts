@@ -1,16 +1,16 @@
 // // src/hooks/useAuthentication.ts
 
 import { atom, useAtom } from "jotai";
-import type { EmailLoginCredentials, RegisterDetails } from "./types.ts";
+import type { EmailLoginCredentials, RegisterDetails } from "./types";
 
 export const authUserStorageKey = "auth-user";
 
-const $isLoading = atom<boolean>(false);
-const $error = atom<Error | null>(null);
+const $isLoadingAtom = atom<boolean>(false);
+const $errorAtom = atom<Error | null>(null);
 
 export const useAuthentication = () => {
-	const [isLoading, setLoading] = useAtom($isLoading);
-	const [error, setError] = useAtom($error);
+	const [isLoading, setLoading] = useAtom($isLoadingAtom);
+	const [error, setError] = useAtom($errorAtom);
 
 	const isAuthenticated = () => {
 		return !!localStorage.getItem(authUserStorageKey);

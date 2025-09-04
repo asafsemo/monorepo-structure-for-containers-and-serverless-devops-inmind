@@ -1,13 +1,13 @@
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { Avatar } from "@/components/ui/avatar.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card.tsx";
+} from "@/components/ui/card";
 import { getStatusColor } from "../services";
 
 interface ProjectActionMembersProps {

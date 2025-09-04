@@ -1,0 +1,93 @@
+{
+  "translation": {
+    "common": {
+      "buttons": {
+        "cancel": "Cancel"
+      },
+      "messages": {
+        "loading": "Loading..."
+      }
+    },
+    "features": {
+      "authentication": {
+        "loginForm": {
+          "title": "Welcome Back",
+          "subtitle": "Sign in to your account to continue",
+          "emailLabel": "Email Address",
+          "passwordLabel": "Password",
+          "submitButton": "Sign In",
+          "noAccount": "Don't have an account?",
+          "signupLink": "Sign up"
+        },
+        "signupForm": {
+          "title": "Create Account",
+          "subtitle": "Sign up to get started",
+          "firstNameLabel": "First Name",
+          "emailLabel": "Email Address",
+          "passwordLabel": "Password",
+          "confirmPasswordLabel": "Confirm Password",
+          "submitButton": "Create Account",
+          "hasAccount": "Already have an account?",
+          "loginLink": "Sign in"
+        },
+        "userMenu": {
+          "settings": "Settings",
+          "logout": "Logout"
+        }
+      },
+      "projects": {
+        "projectsList": {
+          "title": "My Projects",
+          "subtitle": "Manage and monitor your active projects"
+        },
+        "projectCard": {
+          "viewDetails": "View Details",
+          "editProject": "Edit Project",
+          "openProject": "Open Project",
+          "membersCount": "{count} members",
+          "deploymentsCount": "{count} deployments"
+        },
+        "members": {
+          "addMember": "Add Member",
+          "addMemberTitle": "Add Team Member",
+          "addMemberDescription": "Invite a new member to join this project.",
+          "emailLabel": "Email",
+          "emailPlaceholder": "user@example.com",
+          "roleLabel": "Role",
+          "rolePlaceholder": "Developer",
+          "sendInvitation": "Send Invitation"
+        },
+        "deployments": {
+          "newDeployment": "New Deployment",
+          "createTitle": "Create New Deployment",
+          "createDescription": "Deploy a new version to your selected environment.",
+          "versionLabel": "Version",
+          "versionPlaceholder": "v2.1.5",
+          "environmentLabel": "Environment",
+          "environmentPlaceholder": "Production",
+          "notesLabel": "Release Notes",
+          "notesPlaceholder": "Describe the changes in this release...",
+          "deployButton": "Deploy"
+        }
+      }
+    },
+    "components": {
+      "header": {
+        "languageSelector": {
+          "selectLanguage": "Select Language"
+        }
+      }
+    },
+    "errors": {
+      "notFound": {
+        "message": "Oops! Page not found",
+        "backHome": "Return to Home"
+      },
+      "server": {
+        "title": "Oops! Something went wrong",
+        "message": "An unexpected error occurred",
+        "retry": "Reload Page"
+      }
+    }
+  }
+}

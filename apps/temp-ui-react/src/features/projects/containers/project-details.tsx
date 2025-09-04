@@ -1,13 +1,13 @@
-import { Badge } from "@/components/ui/badge.tsx";
+import { Badge } from "@/components/ui/badge";
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card.tsx";
+} from "@/components/ui/card";
 import { getStatusColor } from "../services";
-import type { Project } from "../types.ts";
+import type { Project } from "../types";
 
 interface ProjectDetailsProps {
 	project: Project;
@@ -18,7 +18,7 @@ export const ProjectDetails = (props: ProjectDetailsProps) => {
 
 	return (
 		// {/* Main Content */}
-		<div className="max-w-4xl">
+		<div className="w-full">
 			{/* Project Overview */}
 			<Card className="mb-6">
 				<CardHeader>

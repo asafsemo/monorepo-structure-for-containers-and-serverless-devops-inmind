@@ -1,0 +1,93 @@
+{
+  "translation": {
+    "common": {
+      "buttons": {
+        "cancel": "Annuler"
+      },
+      "messages": {
+        "loading": "Chargement..."
+      }
+    },
+    "features": {
+      "authentication": {
+        "loginForm": {
+          "title": "Bon retour",
+          "subtitle": "Connectez-vous à votre compte pour continuer",
+          "emailLabel": "Adresse e-mail",
+          "passwordLabel": "Mot de passe",
+          "submitButton": "Se connecter",
+          "noAccount": "Vous n'avez pas de compte ?",
+          "signupLink": "S'inscrire"
+        },
+        "signupForm": {
+          "title": "Créer un compte",
+          "subtitle": "Inscrivez-vous pour commencer",
+          "firstNameLabel": "Prénom",
+          "emailLabel": "Adresse e-mail",
+          "passwordLabel": "Mot de passe",
+          "confirmPasswordLabel": "Confirmer le mot de passe",
+          "submitButton": "Créer un compte",
+          "hasAccount": "Vous avez déjà un compte ?",
+          "loginLink": "Se connecter"
+        },
+        "userMenu": {
+          "settings": "Paramètres",
+          "logout": "Déconnexion"
+        }
+      },
+      "projects": {
+        "projectsList": {
+          "title": "Mes Projets",
+          "subtitle": "Gérez et surveillez vos projets actifs"
+        },
+        "projectCard": {
+          "viewDetails": "Voir les Détails",
+          "editProject": "Modifier le Projet",
+          "openProject": "Ouvrir le Projet",
+          "membersCount": "{count} membres",
+          "deploymentsCount": "{count} déploiements"
+        },
+        "members": {
+          "addMember": "Ajouter un Membre",
+          "addMemberTitle": "Ajouter un Membre d'Équipe",
+          "addMemberDescription": "Invitez un nouveau membre à rejoindre ce projet.",
+          "emailLabel": "E-mail",
+          "emailPlaceholder": "utilisateur@exemple.com",
+          "roleLabel": "Rôle",
+          "rolePlaceholder": "Développeur",
+          "sendInvitation": "Envoyer l'Invitation"
+        },
+        "deployments": {
+          "newDeployment": "Nouveau Déploiement",
+          "createTitle": "Créer un Nouveau Déploiement",
+          "createDescription": "Déployez une nouvelle version dans votre environnement sélectionné.",
+          "versionLabel": "Version",
+          "versionPlaceholder": "v2.1.5",
+          "environmentLabel": "Environnement",
+          "environmentPlaceholder": "Production",
+          "notesLabel": "Notes de Version",
+          "notesPlaceholder": "Décrivez les changements de cette version...",
+          "deployButton": "Déployer"
+        }
+      }
+    },
+    "components": {
+      "header": {
+        "languageSelector": {
+          "selectLanguage": "Sélectionner la langue"
+        }
+      }
+    },
+    "errors": {
+      "notFound": {
+        "message": "Oops! Page non trouvée",
+        "backHome": "Retour à l'accueil"
+      },
+      "server": {
+        "title": "Oops! Quelque chose s'est mal passé",
+        "message": "Une erreur inattendue s'est produite",
+        "retry": "Recharger la page"
+      }
+    }
+  }
+}

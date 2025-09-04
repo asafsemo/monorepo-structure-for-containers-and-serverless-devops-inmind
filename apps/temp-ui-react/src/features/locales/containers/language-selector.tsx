@@ -1,12 +1,12 @@
 import { Globe } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button.tsx";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu.tsx";
+} from "@/components/ui/dropdown-menu";
+import { getTranslation } from "@/integrations/i18n";
 import { useLanguageManager } from "../services";
 
 interface LanguageSelectorProps {
@@ -15,7 +15,7 @@ interface LanguageSelectorProps {
 
 export const LanguageSelector = (props: LanguageSelectorProps) => {
 	const { className } = props;
-	const { t } = useTranslation();
+	const t = getTranslation();
 
 	const { isLoading, changeLanguage, availableLanguages, currentLanguageCode } =
 		useLanguageManager();

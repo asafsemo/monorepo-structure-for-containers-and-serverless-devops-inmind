@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ProtectedRoute } from "@/features/authentication/containers/protected-route.tsx";
-import { useAuthentication } from "@/features/authentication/services";
-import { AuthenticatedMainHeader } from "@/features/layouts/components/authenticated-header.tsx";
-import { LanguageSelector } from "@/features/locales/containers/language-selector.tsx";
+import { LanguageSelector } from "@/features/locales/containers/language-selector";
+import { ThemeToggle } from "@/features/theme/containers/theme-toggle";
+import { AuthenticatedMainHeader } from "@/features/authentication/components/authenticated-header";
+import { ProtectedRoute } from "@/features/authentication/containers/protected-route";
 
 export const Route = createFileRoute("/projects/_layout")({
 	component: RouteLayout,
@@ -12,14 +12,16 @@ export const Route = createFileRoute("/projects/_layout")({
 });
 
 function RouteLayout() {
-	const { logout } = useAuthentication();
-
 	return (
-		<ProtectedRoute redirectUrl="/auth/login">
+		<ProtectedRoute redirectTo="/auth/login">
 			<AuthenticatedMainHeader
-				handleLogout={logout}
 				title="Archimedes Dashboard"
-				extraRightActions={<LanguageSelector />}
+				rightPanelActions={
+					<>
+						<LanguageSelector />
+						<ThemeToggle />
+					</>
+				}
 			/>
 			<Outlet />
 		</ProtectedRoute>

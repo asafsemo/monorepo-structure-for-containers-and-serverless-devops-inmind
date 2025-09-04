@@ -44,6 +44,7 @@ export default defineConfig(({ mode }) => {
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      // '@/features': resolve(__dirname, './src/features'),
     },
   },
 }})

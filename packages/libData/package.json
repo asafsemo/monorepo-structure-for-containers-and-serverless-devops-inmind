@@ -6,10 +6,10 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build1": "yarn g:tsc -b",
+		"build": "yarn g:tsc -b",
 		"lint": "eslint ."
 	},
 	"devDependencies": {
-		"@pkg/dev-config": "*"
+		"@pkg/dev-config": "workspace:*"
 	}
 }
